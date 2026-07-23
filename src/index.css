@@ -1,0 +1,42 @@
+/* Minimal reset. All storefront styling lives in App.css.
+   Light-only by design: the brand palette is a fixed light scheme, so no
+   prefers-color-scheme handling here. */
+
+:root {
+  font-size: 17px;
+  color-scheme: light;
+  text-rendering: optimizeLegibility;
+}
+
+@media (max-width: 1024px) {
+  :root {
+    font-size: 16px;
+  }
+}
+
+body {
+  margin: 0;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
+
+button,
+input,
+select {
+  font-family: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid #1a1a1a;
+  outline-offset: 2px;
+}
