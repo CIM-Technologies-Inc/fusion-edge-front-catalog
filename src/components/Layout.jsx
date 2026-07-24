@@ -8,7 +8,7 @@ import { SearchIcon, UserIcon, HeartIcon, Caret } from './Icons'
 const navItems = [
   { label: 'Home', to: '/', caret: true },
   { label: 'Shop', to: '/shop', caret: true },
-  { label: 'Product', to: null, caret: true },
+  { label: 'Product', to: '/products', caret: false },
   { label: 'Contact', to: null, caret: false },
 ]
 
