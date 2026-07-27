@@ -435,6 +435,30 @@ export default function Product() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.id])
 
+  // CIM/Revit bridge: the WebView2 shim's wcAutoWire() only finds
+  // figure.ct-media-container if it runs after React has painted it. In a
+  // WordPress page that figure is in the server HTML; here it mounts async, so
+  // an early wcAutoWire() call wires nothing. Re-run it once the figure for
+  // this product is in the DOM (and on every product navigation). The shim is
+  // idempotent per element (__cimWired guard) and re-reads attributes fresh at
+  // dragstart, so calling again is safe.
+  useEffect(() => {
+    if (!product) return
+    let tries = 0
+    const wire = () => {
+      const fig = document.querySelector('figure.ct-media-container')
+      if (fig && window.CIMPalette?.wcAutoWire) {
+        window.CIMPalette.wcAutoWire()
+        return
+      }
+      // Figure or shim not ready yet — retry a few frames.
+      if (tries++ < 10) requestAnimationFrame(wire)
+    }
+    wire()
+    // Keyed on product id: re-wire only when a different product mounts.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id])
+
   const variation = useMemo(
     () => (product ? findVariation(product, selection) : null),
     [product, selection]
