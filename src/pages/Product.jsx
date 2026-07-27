@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import {
   getProductBySlug,
@@ -82,17 +82,46 @@ function AttributePicker({ attribute, value, onChange }) {
   )
 }
 
-// Collect attributes whose slug begins with "data-" into an HTML data-* map
-// for the gallery figure. These are spec attributes (used_for_variations =
-// false) that carry configuration a downstream script reads off the DOM —
-// e.g. data-cim-tile-w="600", data-cim-url="…". The term's name is the value
-// (its slug is a mangled, URL-unsafe version).
-function dataAttributesFor(product) {
+// Project a product's attributes onto the gallery figure as data-* attributes,
+// so a downstream script can read the product's configuration off the DOM.
+//
+// Naming (same for spec and variation attributes):
+//   slug already "data-…"  → used as-is        data-cim-tile-w="600"
+//   any other slug         → prefixed data-cim- finish → data-cim-finish
+//
+// Value depends on the attribute's role:
+//   spec (used_for_variations = false)
+//       all term *names*, comma-joined     data-cim-finish="Matte Charcoal,Satin"
+//   variation (used_for_variations = true)
+//       the *selected* term only, live      data-cim-color="#df2626"
+//       — a term with a swatch contributes the swatch, plus a companion
+//         data-cim-<slug>-name carrying the readable name:
+//             data-cim-color="#df2626"  data-cim-color-name="Red Hearrt"
+//       — a term without a swatch contributes its name      data-cim-liter="4L"
+//       Omitted until that attribute is chosen.
+//
+// `selection` is { attributeId: termId } from the pickers. Passing it makes
+// the variation values update as the shopper selects.
+function dataAttributesFor(product, selection = {}) {
   const out = {}
   for (const attr of product.attributes) {
-    if (!attr.slug?.startsWith('data-')) continue
-    const value = attr.terms[0]?.name
-    if (value != null) out[attr.slug] = value
+    if (!attr.terms.length) continue
+    const name = attr.slug?.startsWith('data-') ? attr.slug : `data-cim-${attr.slug}`
+
+    if (attr.usedForVariations) {
+      const termId = selection[attr.id]
+      if (!termId) continue // not chosen yet — no attribute emitted
+      const term = attr.terms.find((t) => t.id === termId)
+      if (!term) continue
+      if (term.swatch) {
+        out[name] = term.swatch
+        out[`${name}-name`] = term.name
+      } else {
+        out[name] = term.name
+      }
+    } else {
+      out[name] = attr.terms.map((t) => t.name).join(',')
+    }
   }
   return out
 }
@@ -365,6 +394,23 @@ export default function Product() {
   // { attributeId: termId }
   const [selection, setSelection] = useState({})
 
+  // Preselect each variation attribute's default term once the product loads
+  // (WooCommerce-style defaults). Keyed on product id so it runs once per
+  // product, not on every render — the user's later picks are preserved.
+  useEffect(() => {
+    if (!product) return
+    const defaults = {}
+    for (const attr of product.attributes) {
+      if (attr.usedForVariations && attr.defaultTermId) {
+        defaults[attr.id] = attr.defaultTermId
+      }
+    }
+    setSelection(defaults)
+    // Intentionally keyed on product id alone: re-run only when a different
+    // product loads, so the shopper's own picks aren't reset on re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id])
+
   const variation = useMemo(
     () => (product ? findVariation(product, selection) : null),
     [product, selection]
@@ -405,7 +451,7 @@ export default function Product() {
           key={variation?.id ?? 'default'}
           images={gallery}
           name={product.name}
-          figureProps={dataAttributesFor(product)}
+          figureProps={dataAttributesFor(product, selection)}
         />
       </div>
 

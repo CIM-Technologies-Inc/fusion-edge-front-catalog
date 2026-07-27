@@ -50,7 +50,7 @@ export async function getProductBySlug(slug) {
         category:categories(id, name, slug),
         images:product_images(id, url, alt, position, variation_id),
         attributes:product_attributes(
-          id, position, used_for_variations,
+          id, position, used_for_variations, default_term_id,
           attribute:attributes(id, name, slug, display_type, position),
           terms:product_attribute_terms(
             position,
@@ -85,6 +85,9 @@ function normalizeProduct(p) {
     .map((pa) => ({
       id: pa.id,
       usedForVariations: pa.used_for_variations,
+      // The term preselected on the storefront (WooCommerce "default"); null
+      // for no default.
+      defaultTermId: pa.default_term_id ?? null,
       ...pa.attribute,
       terms: (pa.terms ?? [])
         .filter((t) => t.term)
