@@ -1073,6 +1073,32 @@ main {
   font-size: 0.88rem;
 }
 
+/* Admin-authored HTML: give block elements the spacing the editor implies. */
+.rich-text > :first-child {
+  margin-top: 0;
+}
+.rich-text > :last-child {
+  margin-bottom: 0;
+}
+.rich-text p {
+  margin: 0 0 1rem;
+}
+.rich-text ul,
+.rich-text ol {
+  margin: 0 0 1rem;
+  padding-left: 1.4rem;
+}
+.rich-text li {
+  margin-bottom: 0.35rem;
+}
+.rich-text a {
+  color: var(--navy);
+  text-decoration: underline;
+}
+.rich-text strong {
+  color: var(--ink);
+}
+
 .specs-dl {
   margin: 0;
   display: grid;

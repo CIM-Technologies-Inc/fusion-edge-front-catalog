@@ -270,9 +270,18 @@ function Tabs({ product }) {
         id={`panel-${tab}`}
         aria-labelledby={`tab-${tab}`}
       >
-        {tab === 'description' && (
-          <p>{product.description ?? 'No description provided.'}</p>
-        )}
+        {tab === 'description' &&
+          (product.description ? (
+            // description is admin-authored HTML. Rendered raw because writes
+            // are restricted to admins by RLS; if untrusted authors ever gain
+            // write access, this must be sanitised (DOMPurify).
+            <div
+              className="rich-text"
+              dangerouslySetInnerHTML={{ __html: product.description }}
+            />
+          ) : (
+            <p>No description provided.</p>
+          ))}
 
         {tab === 'additional' &&
           (specs.length ? (
