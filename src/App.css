@@ -1247,6 +1247,62 @@ main {
   text-decoration: underline;
 }
 
+/* ---------- revit info strip ---------- */
+
+.revit-strip {
+  list-style: none;
+  margin: 1.4rem 0 0;
+  padding: 1rem 0.5rem;
+  background: var(--panel);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Two copies exist: one inside .detail-body (desktop) and one as a direct
+   grid child between gallery and body (mobile). Show one per breakpoint. */
+.revit-strip-mobile {
+  display: none;
+}
+
+.revit-strip li {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  text-align: center;
+  padding: 0 0.6rem;
+}
+
+/* Hairline dividers between the three, not after the last. */
+.revit-strip li + li {
+  border-left: 1px solid var(--line);
+}
+
+.revit-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  color: var(--navy);
+}
+
+.revit-text {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.revit-text strong {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+
+.revit-text small {
+  font-size: 0.68rem;
+  line-height: 1.35;
+  color: var(--muted);
+}
+
 /* ---------- share ---------- */
 
 .share {
@@ -1777,6 +1833,14 @@ main {
      between gallery and product info once they're one on top of the other. */
   .detail {
     gap: 1rem;
+  }
+  /* Show the strip between gallery and body; hide the in-body desktop copy. */
+  .revit-strip-mobile {
+    display: grid;
+    margin: 0.4rem 0 0;
+  }
+  .revit-strip-desktop {
+    display: none;
   }
   .hero {
     padding-top: 2.5rem;

@@ -344,6 +344,62 @@ function Related({ categoryId, excludeId }) {
   )
 }
 
+// Trust-strip equivalent, retargeted for the CIM/Revit workflow: the whole
+// point of the page is dragging the product figure into a Revit model, so the
+// three points explain how.
+function RevitStrip({ className = '' }) {
+  const items = [
+    {
+      // Grabbing hand — reads as "drag this".
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M8 11V6.5a1.5 1.5 0 0 1 3 0V11" />
+          <path d="M11 11V5.5a1.5 1.5 0 0 1 3 0V11" />
+          <path d="M14 11V6.5a1.5 1.5 0 0 1 3 0V12" />
+          <path d="M17 12v-1a1.5 1.5 0 0 1 3 0v4a6 6 0 0 1-6 6h-2a6 6 0 0 1-5.2-3l-2.3-4a1.5 1.5 0 0 1 2.6-1.5L8 14" />
+        </svg>
+      ),
+      title: 'Drag to Revit',
+      sub: 'Drag the product image into your model',
+    },
+    {
+      // Cube — a 3D asset dropping into the model.
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 7.5 12 2 3 7.5v9L12 22l9-5.5v-9Z" />
+          <path d="M3 7.5 12 13l9-5.5M12 13v9" />
+        </svg>
+      ),
+      title: 'Placement ready',
+      sub: 'Specs carried into your model automatically',
+    },
+    {
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M9 12l2 2 4-4" />
+          <circle cx="12" cy="12" r="9" />
+        </svg>
+      ),
+      title: 'CIM plugin',
+      sub: 'Requires the Fusion Edge palette in Revit',
+    },
+  ]
+
+  return (
+    <ul className={`revit-strip ${className}`}>
+      {items.map((it) => (
+        <li key={it.title}>
+          <span className="revit-icon">{it.icon}</span>
+          <span className="revit-text">
+            <strong>{it.title}</strong>
+            <small>{it.sub}</small>
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 // Inline notice styled to the brand. `tone` picks the accent: warn (orange,
 // the brand highlight) or error (red).
 function Alert({ tone = 'warn', icon, children }) {
@@ -503,6 +559,11 @@ export default function Product() {
         />
       </div>
 
+      {/* Mobile only: sits between the stacked gallery and the product info,
+          right where the drag guidance is most useful. The desktop copy lives
+          inside .detail-body below. */}
+      <RevitStrip className="revit-strip-mobile" />
+
       <div className="detail-body">
         <h1>{product.name}</h1>
         <Stars value={0} count={0} />
@@ -569,6 +630,8 @@ export default function Product() {
             </div>
           )}
         </dl>
+
+        <RevitStrip className="revit-strip-desktop" />
 
         {/* <ShareRow name={product.name} /> */}
       </div>
