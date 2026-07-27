@@ -989,6 +989,10 @@ main {
   height: 100%;
   object-fit: contain;
   display: block;
+  /* Let clicks / inspector picks resolve to the figure (gallery-main
+     ct-media-container), which carries the data-cim-* attributes, instead of
+     stopping at this child <img>. */
+  pointer-events: none;
 }
 
 .gallery-thumbs {
