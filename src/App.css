@@ -1766,6 +1766,11 @@ main {
   .detail {
     grid-template-columns: 1fr;
   }
+  /* Stacked: the 3rem gap is column spacing that becomes an oversized gap
+     between gallery and product info once they're one on top of the other. */
+  .detail {
+    gap: 1rem;
+  }
   .hero {
     padding-top: 2.5rem;
     text-align: left;
