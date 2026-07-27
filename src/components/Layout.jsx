@@ -217,9 +217,22 @@ function Footer() {
   )
 }
 
+// Reset scroll to the top on navigation. A SPA keeps the previous scroll
+// position, so following a link from mid-page lands you partway down the next
+// one. Keyed on pathname only — a ?category= change on Shop is an in-page
+// filter and shouldn't jump the view.
+function ScrollToTop() {
+  const { pathname } = useLocation()
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [pathname])
+  return null
+}
+
 export default function Layout() {
   return (
     <div className="site">
+      <ScrollToTop />
       <Header />
       <main>
         <Outlet />
