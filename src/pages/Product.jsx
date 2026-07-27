@@ -82,9 +82,24 @@ function AttributePicker({ attribute, value, onChange }) {
   )
 }
 
+// Collect attributes whose slug begins with "data-" into an HTML data-* map
+// for the gallery figure. These are spec attributes (used_for_variations =
+// false) that carry configuration a downstream script reads off the DOM —
+// e.g. data-cim-tile-w="600", data-cim-url="…". The term's name is the value
+// (its slug is a mangled, URL-unsafe version).
+function dataAttributesFor(product) {
+  const out = {}
+  for (const attr of product.attributes) {
+    if (!attr.slug?.startsWith('data-')) continue
+    const value = attr.terms[0]?.name
+    if (value != null) out[attr.slug] = value
+  }
+  return out
+}
+
 // Main image with thumbnails beneath. A single image renders alone — one
 // thumbnail under one photo is just noise.
-function Gallery({ images, name }) {
+function Gallery({ images, name, figureProps }) {
   const [index, setIndex] = useState(0)
 
   // Selecting a different variation swaps the image set, so an index held
@@ -96,14 +111,16 @@ function Gallery({ images, name }) {
   if (!images.length) {
     return (
       <div className="gallery">
-        <span className="art-empty large" aria-hidden="true" />
+        <figure className="gallery-main ct-media-container" {...figureProps}>
+          <span className="art-empty large" aria-hidden="true" />
+        </figure>
       </div>
     )
   }
 
   return (
     <div className="gallery">
-      <figure className="gallery-main ct-media-container">
+      <figure className="gallery-main ct-media-container" {...figureProps}>
         <img src={main.url} alt={main.alt ?? name} />
       </figure>
 
@@ -185,8 +202,10 @@ function ShareRow({ name }) {
 function Tabs({ product }) {
   const [tab, setTab] = useState('additional')
 
+  // data-* attributes are configuration for the gallery figure, not shopper-
+  // facing specs — keep them out of the Additional information table.
   const specs = product.attributes.filter(
-    (a) => !a.usedForVariations && a.terms.length
+    (a) => !a.usedForVariations && a.terms.length && !a.slug?.startsWith('data-')
   )
 
   // Additional information leads, so the default tab is also the leftmost —
@@ -386,6 +405,7 @@ export default function Product() {
           key={variation?.id ?? 'default'}
           images={gallery}
           name={product.name}
+          figureProps={dataAttributesFor(product)}
         />
       </div>
 
