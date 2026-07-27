@@ -12,10 +12,10 @@ import {
 function Hero({ products, loading }) {
   const [active, setActive] = useState(0)
 
-  // Prefer products flagged `featured`; fall back to the newest so the hero
-  // is never empty on a catalogue where nothing has been featured yet.
-  const featured = products.filter((p) => p.featured)
-  const slides = (featured.length ? featured : products).slice(0, 4)
+  // `products` here is already the featured list (fetched with featured:true),
+  // so the carousel shows featured products only. No fallback: if nothing is
+  // featured, the hero renders nothing.
+  const slides = products.slice(0, 4)
 
   if (loading) return <SkeletonHero />
   if (!slides.length) return null
@@ -166,9 +166,16 @@ export default function Home() {
   const { data, loading, error } = useAsync(() => getProducts({ limit: 12 }), [])
   const products = data ?? []
 
+  // Featured products for the hero are fetched on their own so a featured
+  // product is never missed just because it isn't among the newest 12.
+  const { data: featuredData, loading: featuredLoading } = useAsync(
+    () => getProducts({ featured: true, limit: 4 }),
+    []
+  )
+
   return (
     <>
-      <Hero products={products} loading={loading} />
+      <Hero products={featuredData ?? []} loading={featuredLoading} />
       <CategoryTiles />
       <Feature />
       <Trending products={products} loading={loading} error={error} />

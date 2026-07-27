@@ -18,8 +18,8 @@ function useNavItems() {
 
   return [
     { label: 'Home', to: '/', caret: true },
-    { label: 'Shop', to: '/shop', caret: true },
-    { label: 'Product', to: '/products', children: catChildren },
+    { label: 'Shop', to: '/products', caret: true },
+    { label: 'Category', to: '/shop', children: catChildren },
     { label: 'Contact', to: null },
   ]
 }
