@@ -344,6 +344,17 @@ function Related({ categoryId, excludeId }) {
   )
 }
 
+// Inline notice styled to the brand. `tone` picks the accent: warn (orange,
+// the brand highlight) or error (red).
+function Alert({ tone = 'warn', icon, children }) {
+  return (
+    <div className={`alert alert-${tone}`} role="alert">
+      {icon && <span className="alert-icon" aria-hidden="true">{icon}</span>}
+      <p>{children}</p>
+    </div>
+  )
+}
+
 function SaveButton({ product, variation }) {
   const { user } = useAuth()
   const variationId = variation?.id ?? null
@@ -358,9 +369,9 @@ function SaveButton({ product, variation }) {
 
   if (!user) {
     return (
-      <p className="muted">
+      <Alert tone="warn" icon="♡">
         <Link to="/signin">Sign in</Link> to save this to your library.
-      </p>
+      </Alert>
     )
   }
 
@@ -388,7 +399,11 @@ function SaveButton({ product, variation }) {
       >
         {busy ? 'Saving…' : saved ? '♥ Saved to library' : '♡ Save to library'}
       </button>
-      {err && <p className="error">{err.message}</p>}
+      {err && (
+        <Alert tone="error" icon="⚠">
+          {err.message}
+        </Alert>
+      )}
     </>
   )
 }
