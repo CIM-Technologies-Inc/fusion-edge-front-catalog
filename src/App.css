@@ -840,6 +840,8 @@ main {
   width: 100%;
   height: 100%;
   object-fit: contain;
+  /* Blend white photo backgrounds into the grey panel — see .gallery-main img. */
+  mix-blend-mode: multiply;
 }
 
 .tile-art img {
@@ -993,6 +995,11 @@ main {
      ct-media-container), which carries the data-cim-* attributes, instead of
      stopping at this child <img>. */
   pointer-events: none;
+  /* multiply drops the photo's white background onto the panel colour, so a
+     white-backed product blends into #f2f1ef. White → panel; darker product
+     pixels are largely unchanged. Note: it also darkens light product areas,
+     and only works because .gallery-main's background is the panel. */
+  mix-blend-mode: multiply;
 }
 
 .gallery-thumbs {
