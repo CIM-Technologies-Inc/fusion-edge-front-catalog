@@ -103,7 +103,7 @@ function Gallery({ images, name }) {
 
   return (
     <div className="gallery">
-      <figure className="gallery-main">
+      <figure className="gallery-main ct-media-container">
         <img src={main.url} alt={main.alt ?? name} />
       </figure>
 
