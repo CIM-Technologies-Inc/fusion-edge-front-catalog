@@ -1753,4 +1753,23 @@ main {
   .cart li {
     grid-template-columns: 1fr auto;
   }
+
+  /* Keep the three product tabs on one line. Labels are long ("Additional
+     information"), so tighten them and let the row scroll sideways if needed
+     rather than wrap. */
+  .tablist {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    gap: 1.2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tablist::-webkit-scrollbar {
+    display: none;
+  }
+  .tab {
+    white-space: nowrap;
+    font-size: 0.82rem;
+    flex: 0 0 auto;
+  }
 }
