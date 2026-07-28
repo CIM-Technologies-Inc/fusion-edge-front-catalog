@@ -1005,7 +1005,7 @@ main {
 .swatch {
   width: 2rem;
   height: 2rem;
-  border-radius: 50%;
+  border-radius: 5px;
   border: 1px solid var(--line);
   cursor: pointer;
   padding: 0;

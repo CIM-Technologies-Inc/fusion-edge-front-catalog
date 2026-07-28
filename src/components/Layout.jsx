@@ -255,12 +255,12 @@ function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <Link to="/" className="logo light" aria-label="Fusion Edge home">
-          <Logo className="on-dark" />
+          <Logo/>
         </Link>
         <address>
-          2593 Timbercrest Road, Chisana, Alaska
+          706 SEDCCO 1 Building, 120 Rada cor. Legaspi St.,
           <br />
-          United State
+          Legaspi Village, Makati City
         </address>
         <address>
           907-723-4608

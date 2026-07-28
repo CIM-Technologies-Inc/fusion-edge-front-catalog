@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { getProducts, getCategories, formatPriceRange, imagesFor } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import ProductCard from '../components/ProductCard'
@@ -148,14 +148,25 @@ function Trending({ products, loading, error }) {
 }
 
 function SearchBar() {
+  const [term, setTerm] = useState('')
+  const navigate = useNavigate()
+
+  const submit = (e) => {
+    e.preventDefault()
+    const q = term.trim()
+    if (q) navigate(`/products?q=${encodeURIComponent(q)}`)
+  }
+
   return (
     <section className="searchbar">
-      <form
-        onSubmit={(e) => e.preventDefault()}
-        role="search"
-        aria-label="Product search"
-      >
-        <input type="search" placeholder="Enter your keywords..." />
+      <form onSubmit={submit} role="search" aria-label="Product search">
+        <input
+          type="search"
+          value={term}
+          onChange={(e) => setTerm(e.target.value)}
+          placeholder="Enter your keywords..."
+          aria-label="Search products"
+        />
         <button type="submit">⌕ SEARCH</button>
       </form>
     </section>
