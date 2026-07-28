@@ -1,33 +1,48 @@
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { getProducts } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import ProductCard from '../components/ProductCard'
 import { SkeletonTiles } from '../components/Skeleton'
 
-// The full catalogue, unfiltered. Shop (/shop) is the same grid with category
-// chips; this is the plain "everything" list linked from the Product nav.
+// The full catalogue, optionally filtered by a ?q= search term (from the
+// header search). Shop (/shop) is the same grid with category chips.
 export default function Products() {
-  const { data, loading, error } = useAsync(() => getProducts({ limit: 100 }), [])
+  const [params] = useSearchParams()
+  const query = (params.get('q') ?? '').trim()
+
+  const { data, loading, error } = useAsync(
+    () => getProducts({ search: query || undefined, limit: 100 }),
+    [query]
+  )
   const products = data ?? []
 
   return (
     <section className="trending fade-up">
-      <h2>All Products</h2>
+      <h2>{query ? `Search: “${query}”` : 'All Products'}</h2>
 
       {loading && <SkeletonTiles count={8} />}
       {error && <p className="error">Couldn’t load products: {error.message}</p>}
 
       {!loading && !error && !products.length && (
         <p className="muted">
-          No products yet. Add some from the Supabase dashboard (and set{' '}
-          <code>published = true</code>).
+          {query ? (
+            <>
+              No products match “{query}”. <Link to="/products">Show all</Link>.
+            </>
+          ) : (
+            <>
+              No products yet. Add some from the Supabase dashboard (and set{' '}
+              <code>published = true</code>).
+            </>
+          )}
         </p>
       )}
 
       {Boolean(products.length) && (
         <>
           <p className="sub">
-            Showing {products.length} product{products.length === 1 ? '' : 's'}.
+            Showing {products.length} product{products.length === 1 ? '' : 's'}
+            {query ? ` for “${query}”` : ''}.
           </p>
           <div className="tiles">
             {products.map((p) => (

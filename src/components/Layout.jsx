@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth, signOut } from '../lib/auth'
 import { getCategories } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
@@ -141,6 +141,69 @@ function MobileNav({ open, onClose }) {
   )
 }
 
+// Header search: the icon opens a centred overlay with a large search bar.
+// Submitting navigates to /products?q=<term>, where the Products page filters
+// by name. Backdrop click / Escape closes; body scroll locks while open.
+function SearchBox() {
+  const [open, setOpen] = useState(false)
+  const [term, setTerm] = useState('')
+  const inputRef = useRef(null)
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (!open) return
+    inputRef.current?.focus()
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('keydown', onKey)
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.removeEventListener('keydown', onKey)
+      document.body.style.overflow = ''
+    }
+  }, [open])
+
+  const submit = (e) => {
+    e.preventDefault()
+    const q = term.trim()
+    if (!q) return
+    navigate(`/products?q=${encodeURIComponent(q)}`)
+    setOpen(false)
+    setTerm('')
+  }
+
+  return (
+    <>
+      <button type="button" aria-label="Open search" onClick={() => setOpen(true)}>
+        <SearchIcon />
+      </button>
+
+      <div
+        className={open ? 'search-overlay open' : 'search-overlay'}
+        aria-hidden={!open}
+      >
+        <div className="search-backdrop" onClick={() => setOpen(false)} />
+        <form className="search-panel" onSubmit={submit} role="search">
+          <span className="search-panel-icon" aria-hidden="true">
+            <SearchIcon />
+          </span>
+          <input
+            ref={inputRef}
+            type="search"
+            value={term}
+            onChange={(e) => setTerm(e.target.value)}
+            placeholder="Search products…"
+            aria-label="Search products"
+            tabIndex={open ? 0 : -1}
+          />
+          <button type="button" className="search-close" aria-label="Close search" onClick={() => setOpen(false)}>
+            <Close />
+          </button>
+        </form>
+      </div>
+    </>
+  )
+}
+
 function Header() {
   const { user } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
@@ -166,9 +229,7 @@ function Header() {
         <DesktopNav items={items} />
 
         <div className="topbar-actions">
-          <button type="button" aria-label="Search">
-            <SearchIcon />
-          </button>
+          <SearchBox />
           <Link to="/library" aria-label="Your library">
             <HeartIcon />
           </Link>

@@ -116,6 +116,89 @@ main {
   align-items: center;
 }
 
+/* Header search overlay: the icon opens a centred bar over a dimmed backdrop. */
+.search-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: start center;
+  padding-top: 18vh;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.search-overlay.open {
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.search-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.search-overlay.open .search-backdrop {
+  opacity: 1;
+}
+
+.search-panel {
+  position: relative;
+  width: min(92vw, 40rem);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  background: #fff;
+  padding: 0.9rem 1.1rem;
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.25);
+  transform: translateY(-0.8rem);
+  opacity: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.search-overlay.open .search-panel {
+  transform: none;
+  opacity: 1;
+}
+
+.search-panel-icon {
+  display: inline-flex;
+  color: var(--muted);
+}
+
+.search-panel input {
+  flex: 1;
+  border: 0;
+  background: none;
+  font: inherit;
+  font-size: 1.1rem;
+  outline: none;
+  min-width: 0;
+}
+
+.search-close {
+  background: none;
+  border: 0;
+  padding: 0.2rem;
+  color: var(--muted);
+  cursor: pointer;
+  display: inline-flex;
+}
+
+.search-close:hover {
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .search-backdrop,
+  .search-panel {
+    transition: none;
+  }
+}
+
 /* Burger: hidden on desktop, shown at the mobile breakpoint. */
 .burger-btn {
   display: none;
@@ -1179,6 +1262,10 @@ main {
 
 /* ---------- inline alert ---------- */
 
+/* Scoped to .detail so a host theme (WooCommerce/Blocksy, when embedded)
+   can't flatten the horizontal padding to 0 — the extra selector out-weighs a
+   bare .alert rule. */
+.detail .alert,
 .alert {
   display: flex;
   align-items: flex-start;
@@ -1188,6 +1275,7 @@ main {
   background: var(--alert-bg);
   font-size: 0.85rem;
   line-height: 1.5;
+  border-radius: 2px;
 }
 
 .alert p {

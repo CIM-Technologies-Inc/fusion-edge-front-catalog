@@ -425,7 +425,7 @@ function SaveButton({ product, variation }) {
 
   if (!user) {
     return (
-      <Alert tone="warn" icon="♡">
+      <Alert tone="" icon="♡">
         <Link to="/signin">Sign in</Link> to save this to your library.
       </Alert>
     )
