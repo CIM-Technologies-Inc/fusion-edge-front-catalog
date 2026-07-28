@@ -1341,9 +1341,10 @@ main {
   list-style: none;
   margin: 1.4rem 0 0;
   padding: 1rem 0.5rem;
-  background: var(--panel);
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  border: 1px solid var(--line);
+  border-radius: 5px;
 }
 
 /* Two copies exist: one inside .detail-body (desktop) and one as a direct
