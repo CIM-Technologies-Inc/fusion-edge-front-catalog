@@ -199,6 +199,50 @@ main {
   }
 }
 
+/* Back-to-top: fixed bottom-right, fades in once scrolled down. */
+.back-to-top {
+  position: fixed;
+  right: 1.4rem;
+  bottom: 1.4rem;
+  z-index: 40;
+  width: 2.8rem;
+  height: 2.8rem;
+  display: grid;
+  place-items: center;
+  background: var(--navy);
+  color: #fff;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+  opacity: 0;
+  transform: translateY(0.6rem);
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease, background 0.15s ease;
+}
+
+.back-to-top.show {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+
+.back-to-top:hover {
+  background: #163d75;
+}
+
+.back-to-top svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top {
+    transition: opacity 0.2s ease;
+    transform: none;
+  }
+}
+
 /* Burger: hidden on desktop, shown at the mobile breakpoint. */
 .burger-btn {
   display: none;
