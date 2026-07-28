@@ -71,7 +71,7 @@ function CategoryTiles() {
 
   return (
     <section className="cat-tiles">
-      {categories.slice(0, 2).map((c) => (
+      {categories.slice(0, 3).map((c) => (
         <Link to={`/shop?category=${c.slug}`} key={c.id} className="cat-tile fade-up">
           {/* No striped placeholder here: a category without a picture reads
               better as a plain panel than as a "missing image" box. */}

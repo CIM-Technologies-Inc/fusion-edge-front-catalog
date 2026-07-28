@@ -62,7 +62,7 @@ export function SkeletonHero() {
   )
 }
 
-export function SkeletonCategoryTiles({ count = 2 }) {
+export function SkeletonCategoryTiles({ count = 3 }) {
   return (
     <section className="cat-tiles" aria-busy="true" aria-label="Loading categories">
       {Array.from({ length: count }, (_, i) => (

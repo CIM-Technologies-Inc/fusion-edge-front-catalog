@@ -48,24 +48,55 @@ function AttributePicker({ attribute, value, onChange }) {
           </em>
         )}
       </span>
-      <div className={type === 'color' ? 'swatches' : 'chips'} role="group">
+      <div
+        className={
+          type === 'color' ? 'swatches' : type === 'image' ? 'img-swatches' : 'chips'
+        }
+        role="group"
+      >
         {terms.map((t) => {
           const on = value === t.id
           // Clicking the selected term clears it, so a choice isn't a trap.
           const toggle = () => onChange(on ? null : t.id)
 
-          return type === 'color' ? (
-            <button
-              key={t.id}
-              type="button"
-              className={on ? 'swatch on' : 'swatch'}
-              style={{ background: t.swatch ?? '#ddd' }}
-              onClick={toggle}
-              aria-pressed={on}
-              aria-label={t.name}
-              title={t.name}
-            />
-          ) : (
+          if (type === 'color') {
+            return (
+              <button
+                key={t.id}
+                type="button"
+                className={on ? 'swatch on' : 'swatch'}
+                style={{ background: t.swatch ?? '#ddd' }}
+                onClick={toggle}
+                aria-pressed={on}
+                aria-label={t.name}
+                title={t.name}
+              />
+            )
+          }
+
+          // display_type 'image': the swatch column holds an image URL. Render
+          // a thumbnail button; fall back to a text chip if the URL is missing.
+          if (type === 'image') {
+            return (
+              <button
+                key={t.id}
+                type="button"
+                className={on ? 'img-swatch on' : 'img-swatch'}
+                onClick={toggle}
+                aria-pressed={on}
+                aria-label={t.name}
+                title={t.name}
+              >
+                {t.swatch ? (
+                  <img src={t.swatch} alt={t.name} loading="lazy" />
+                ) : (
+                  <span className="img-swatch-fallback">{t.name}</span>
+                )}
+              </button>
+            )
+          }
+
+          return (
             <button
               key={t.id}
               type="button"
