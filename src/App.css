@@ -534,28 +534,51 @@ main {
   grid-row: 1 / span 2;
 }
 
+/* Category tile: the image covers the whole card, name overlaid at the
+   bottom over a scrim. The left tile spans two rows, so its image fills the
+   taller space instead of floating small in the middle. */
 .cat-tile {
+  position: relative;
   background: var(--panel);
-  padding: 2.5rem 2rem 1.6rem;
-  display: grid;
-  gap: 1rem;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  min-height: 13rem;
+  padding: 1.5rem 1.6rem;
+  isolation: isolate;
 }
 
-/* Without a picture the tile is just a label, so it doesn't need the height
-   reserved for artwork. :has() lets the tile size itself. */
-.cat-tile:not(:has(img)) {
-  padding: 1.6rem 2rem;
-  min-height: 0;
-}
-
-.cat-tile .art {
+.cat-bg {
+  position: absolute;
+  inset: 0;
   width: 100%;
-  height: 11rem;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+  transition: transform 0.5s ease;
+}
+
+.cat-tile.has-image:hover .cat-bg {
+  transform: scale(1.04);
+}
+
+/* Scrim so the label reads over any image; stronger toward the bottom. */
+.cat-tile.has-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.15) 40%,
+    rgba(0, 0, 0, 0) 70%
+  );
 }
 
 .cat-meta h2 {
   margin: 0;
-  font-size: 1.15rem;
+  font-size: 1.3rem;
   font-weight: 600;
 }
 
@@ -563,6 +586,50 @@ main {
   margin: 0.2rem 0 0;
   color: var(--muted);
   font-size: 0.8rem;
+}
+
+/* Over an image, text goes white and the CTA appears. */
+.cat-tile.has-image .cat-meta h2 {
+  color: #fff;
+}
+
+.cat-tile.has-image .cat-meta p {
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.cat-cta {
+  display: inline-block;
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.cat-tile.has-image .cat-cta {
+  color: #fff;
+}
+
+.cat-tile:hover .cat-cta,
+.cat-tile:focus-visible .cat-cta {
+  opacity: 1;
+  transform: none;
+}
+
+/* No image: keep it a simple labelled panel, no scrim, dark text. */
+.cat-tile:not(.has-image) .cat-cta {
+  color: var(--sale);
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cat-bg,
+  .cat-cta {
+    transition: none;
+  }
 }
 
 /* ---------- feature ---------- */
@@ -925,8 +992,7 @@ main {
 /* ---------- product media ---------- */
 
 .tile-art img,
-.hero-art img,
-.cat-tile img {
+.hero-art img {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -940,10 +1006,6 @@ main {
 
 .hero-art img {
   max-height: 22rem;
-}
-
-.cat-tile img {
-  height: 11rem;
 }
 
 /* Neutral block where a product has no image yet. */
