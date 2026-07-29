@@ -243,6 +243,47 @@ main {
   }
 }
 
+/* Revit WebView2 nav: floating Back + Refresh. Hidden on desktop (real
+   browsers have their own chrome); shown at the mobile breakpoint where
+   WebView2 renders. Bottom-left, opposite the back-to-top button. */
+.webview-nav {
+  display: none;
+}
+
+@media (max-width: 44rem) {
+  .webview-nav {
+    position: fixed;
+    right: 1rem;
+    top: 6.4rem;
+    z-index: 40;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+  }
+}
+
+.webview-btn {
+  width: 2.8rem;
+  height: 2.8rem;
+  display: grid;
+  place-items: center;
+  background: #fff;
+  color: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+}
+
+.webview-btn:active {
+  background: var(--panel);
+}
+
+.webview-btn svg {
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
 /* Burger: hidden on desktop, shown at the mobile breakpoint. */
 .burger-btn {
   display: none;

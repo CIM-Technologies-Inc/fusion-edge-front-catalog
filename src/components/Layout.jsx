@@ -323,6 +323,49 @@ function BackToTop() {
   )
 }
 
+// Floating Back + Refresh for the Revit WebView2 host, which has no browser
+// chrome. Mobile-only (WebView2 renders at mobile width). Back hides when
+// there's nothing in history to return to.
+function WebViewNav() {
+  const navigate = useNavigate()
+  const location = useLocation()
+  const [canGoBack, setCanGoBack] = useState(false)
+
+  // history.length is unreliable across browsers, but within an SPA session we
+  // can track our own depth: every push increases the router's history idx.
+  useEffect(() => {
+    const idx = window.history.state?.idx
+    setCanGoBack(typeof idx === 'number' ? idx > 0 : window.history.length > 1)
+  }, [location.key])
+
+  return (
+    <div className="webview-nav" aria-label="Page navigation">
+      {canGoBack && (
+        <button
+          type="button"
+          className="webview-btn"
+          onClick={() => navigate(-1)}
+          aria-label="Go back"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
+      )}
+      <button
+        type="button"
+        className="webview-btn"
+        onClick={() => window.location.reload()}
+        aria-label="Refresh page"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" />
+        </svg>
+      </button>
+    </div>
+  )
+}
+
 export default function Layout() {
   return (
     <div className="site">
@@ -332,6 +375,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <WebViewNav />
       <BackToTop />
     </div>
   )

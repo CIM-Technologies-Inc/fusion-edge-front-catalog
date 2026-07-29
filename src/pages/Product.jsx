@@ -124,11 +124,14 @@ function AttributePicker({ attribute, value, onChange }) {
 //   spec (used_for_variations = false)
 //       all term *names*, comma-joined     data-cim-finish="Matte Charcoal,Satin"
 //   variation (used_for_variations = true), the *selected* term only, live:
-//       display_type 'color'  → a selected-…-code / -type pair:
-//             data-cim-selected-color-code="#b0907c"
-//             data-cim-selected-color-type="Mocha"
-//         The "selected-" prefix keeps this distinct from any static
-//         data-cim-color-code spec on the product, so they never collide.
+//       display_type 'color'  → emits, for an attribute slug "color" named
+//       "Color Type":
+//             data-cim-color-code="<hex>"   from the SLUG, the picked hex
+//             data-cim-color-name="Mocha"   from the SLUG, the label
+//             data-cim-color-type="<hex>"   from the NAME ("Color Type"), hex
+//         Slug drives -code/-name; the attribute name drives the third bare
+//         attribute. When a static spec shares one of these names and is
+//         ordered later in the DB, the spec value wins for that name.
 //       any other type        → a single value:
 //             data-cim-liter="4L"
 //       Omitted until that attribute is chosen.
@@ -148,13 +151,14 @@ function dataAttributesFor(product, selection = {}) {
       if (!term) continue
 
       if (attr.display_type === 'color') {
-        // Colour swatch → distinct "selected-" names so a static
-        // data-cim-<slug>-code spec is never overwritten.
+        // Colour swatch → hex under -code, label under -name, plus a bare
+        // data-cim-<slug> carrying the hex.
         const base = attr.slug?.startsWith('data-')
           ? `${attr.slug}-color`
-          : `data-cim-selected-${attr.slug}`
+          : `data-cim-${attr.slug}`
         out[`${base}-code`] = term.swatch ?? ''
         out[`${base}-name`] = term.name
+        out[`data-cim-${attr.name.trim().toLowerCase().replace(/\s+/g, '-')}`] = term.swatch ?? ''
       } else {
         out[name] = term.name
       }
