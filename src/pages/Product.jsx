@@ -123,12 +123,14 @@ function AttributePicker({ attribute, value, onChange }) {
 // Value depends on the attribute's role:
 //   spec (used_for_variations = false)
 //       all term *names*, comma-joined     data-cim-finish="Matte Charcoal,Satin"
-//   variation (used_for_variations = true)
-//       the *selected* term only, live      data-cim-color="#df2626"
-//       — a term with a swatch contributes the swatch, plus a companion
-//         data-cim-<slug>-name carrying the readable name:
-//             data-cim-color="#df2626"  data-cim-color-name="Red Hearrt"
-//       — a term without a swatch contributes its name      data-cim-liter="4L"
+//   variation (used_for_variations = true), the *selected* term only, live:
+//       display_type 'color'  → a selected-…-code / -type pair:
+//             data-cim-selected-color-code="#b0907c"
+//             data-cim-selected-color-type="Mocha"
+//         The "selected-" prefix keeps this distinct from any static
+//         data-cim-color-code spec on the product, so they never collide.
+//       any other type        → a single value:
+//             data-cim-liter="4L"
 //       Omitted until that attribute is chosen.
 //
 // `selection` is { attributeId: termId } from the pickers. Passing it makes
@@ -144,9 +146,15 @@ function dataAttributesFor(product, selection = {}) {
       if (!termId) continue // not chosen yet — no attribute emitted
       const term = attr.terms.find((t) => t.id === termId)
       if (!term) continue
-      if (term.swatch) {
-        out[name] = term.swatch
-        out[`${name}-name`] = term.name
+
+      if (attr.display_type === 'color') {
+        // Colour swatch → distinct "selected-" names so a static
+        // data-cim-<slug>-code spec is never overwritten.
+        const base = attr.slug?.startsWith('data-')
+          ? `${attr.slug}-color`
+          : `data-cim-selected-${attr.slug}`
+        out[`${base}-code`] = term.swatch ?? ''
+        out[`${base}-name`] = term.name
       } else {
         out[name] = term.name
       }
