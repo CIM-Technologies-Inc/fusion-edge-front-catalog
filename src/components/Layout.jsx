@@ -4,6 +4,8 @@ import { useAuth, signOut } from '../lib/auth'
 import { getCategories } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import Logo from './Logo'
+import Breadcrumbs from './Breadcrumbs'
+import { BreadcrumbContext } from '../lib/breadcrumbs'
 import { SearchIcon, UserIcon, HeartIcon, Caret, Burger, Close } from './Icons'
 
 // Build the nav from a live category list. "Product" carries the categories as
@@ -392,18 +394,23 @@ function MobileTabBar({ onOpenMenu }) {
 
 export default function Layout() {
   const [menuOpen, setMenuOpen] = useState(false)
+  // A page may override the auto-derived breadcrumb trail via useBreadcrumb().
+  const [crumbs, setCrumbs] = useState(null)
 
   return (
-    <div className="site">
-      <ScrollToTop />
-      <Header menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
-      <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
-      <main>
-        <Outlet />
-      </main>
-      <Footer />
-      <MobileTabBar onOpenMenu={() => setMenuOpen(true)} />
-      <BackToTop />
-    </div>
+    <BreadcrumbContext.Provider value={setCrumbs}>
+      <div className="site">
+        <ScrollToTop />
+        <Header menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
+        <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
+        <main>
+          <Breadcrumbs items={crumbs ?? undefined} />
+          <Outlet />
+        </main>
+        <Footer />
+        <MobileTabBar onOpenMenu={() => setMenuOpen(true)} />
+        <BackToTop />
+      </div>
+    </BreadcrumbContext.Provider>
   )
 }

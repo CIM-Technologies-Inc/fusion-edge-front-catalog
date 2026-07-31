@@ -14,6 +14,7 @@ import {
 } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import { useAuth } from '../lib/auth'
+import { useBreadcrumb } from '../lib/breadcrumbs'
 import ProductCard from '../components/ProductCard'
 import { SkeletonDetail, SkeletonTabs, SkeletonTiles } from '../components/Skeleton'
 
@@ -512,6 +513,19 @@ export default function Product() {
   const { data: product, loading, error } = useAsync(
     () => getProductBySlug(slug),
     [slug]
+  )
+
+  // Breadcrumb: Home / <Category> / <Product>. Falls back to just the product
+  // name until it loads.
+  useBreadcrumb(
+    product
+      ? [
+          ...(product.category
+            ? [{ label: product.category.name, to: `/shop?category=${product.category.slug}` }]
+            : []),
+          { label: product.name },
+        ]
+      : [{ label: 'Product' }]
   )
 
   // { attributeId: termId }
