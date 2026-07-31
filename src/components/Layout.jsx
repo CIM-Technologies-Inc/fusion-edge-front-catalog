@@ -204,9 +204,8 @@ function SearchBox() {
   )
 }
 
-function Header() {
+function Header({ onOpenMenu, menuOpen }) {
   const { user } = useAuth()
-  const [menuOpen, setMenuOpen] = useState(false)
   const items = useNavItems()
 
   return (
@@ -217,7 +216,7 @@ function Header() {
           className="burger-btn"
           aria-label="Open menu"
           aria-expanded={menuOpen}
-          onClick={() => setMenuOpen(true)}
+          onClick={onOpenMenu}
         >
           <Burger />
         </button>
@@ -244,8 +243,6 @@ function Header() {
           )}
         </div>
       </div>
-
-      <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
     </header>
   )
 }
@@ -323,59 +320,89 @@ function BackToTop() {
   )
 }
 
-// Floating Back + Refresh for the Revit WebView2 host, which has no browser
-// chrome. Mobile-only (WebView2 renders at mobile width). Back hides when
-// there's nothing in history to return to.
-function WebViewNav() {
+// Floating bottom tab bar for the Revit WebView2 host (no browser chrome).
+// Back · Refresh · [Home center] · Menu. Mobile-width only. Back is disabled
+// when there's nothing in history to return to.
+function MobileTabBar({ onOpenMenu }) {
   const navigate = useNavigate()
   const location = useLocation()
   const [canGoBack, setCanGoBack] = useState(false)
 
-  // history.length is unreliable across browsers, but within an SPA session we
-  // can track our own depth: every push increases the router's history idx.
   useEffect(() => {
     const idx = window.history.state?.idx
     setCanGoBack(typeof idx === 'number' ? idx > 0 : window.history.length > 1)
   }, [location.key])
 
+  const icon = {
+    back: <path d="M15 18l-6-6 6-6" />,
+    refresh: <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" />,
+    home: <path d="M3 10.5 12 3l9 7.5M5 9.5V21h14V9.5" />,
+    menu: <path d="M3 6h18M3 12h18M3 18h18" />,
+  }
+  const Ico = ({ d }) => (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      {d}
+    </svg>
+  )
+
   return (
-    <div className="webview-nav" aria-label="Page navigation">
-      {canGoBack && (
-        <button
-          type="button"
-          className="webview-btn"
-          onClick={() => navigate(-1)}
-          aria-label="Go back"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
-      )}
+    <nav className="tabbar" aria-label="Quick navigation">
       <button
         type="button"
-        className="webview-btn"
+        className="tab-item"
+        onClick={() => navigate(-1)}
+        disabled={!canGoBack}
+        aria-label="Go back"
+      >
+        <Ico d={icon.back} />
+        <span>Back</span>
+      </button>
+
+      <button
+        type="button"
+        className="tab-item"
         onClick={() => window.location.reload()}
         aria-label="Refresh page"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-          <path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6" />
-        </svg>
+        <Ico d={icon.refresh} />
+        <span>Refresh</span>
       </button>
-    </div>
+
+      <button
+        type="button"
+        className="tab-center"
+        onClick={() => navigate('/')}
+        aria-label="Home"
+      >
+        <Ico d={icon.home} />
+      </button>
+
+      <button
+        type="button"
+        className="tab-item"
+        onClick={onOpenMenu}
+        aria-label="Open menu"
+      >
+        <Ico d={icon.menu} />
+        <span>Menu</span>
+      </button>
+    </nav>
   )
 }
 
 export default function Layout() {
+  const [menuOpen, setMenuOpen] = useState(false)
+
   return (
     <div className="site">
       <ScrollToTop />
-      <Header />
+      <Header menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
+      <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
       <main>
         <Outlet />
       </main>
       <Footer />
-      <WebViewNav />
+      <MobileTabBar onOpenMenu={() => setMenuOpen(true)} />
       <BackToTop />
     </div>
   )

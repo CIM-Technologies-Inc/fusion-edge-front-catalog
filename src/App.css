@@ -243,45 +243,92 @@ main {
   }
 }
 
-/* Revit WebView2 nav: floating Back + Refresh. Hidden on desktop (real
-   browsers have their own chrome); shown at the mobile breakpoint where
-   WebView2 renders. Bottom-left, opposite the back-to-top button. */
-.webview-nav {
+/* Floating bottom tab bar (Back · Refresh · Home · Menu) for the WebView2
+   host, which has no browser chrome. Hidden on desktop; shown at the mobile
+   breakpoint where the Revit panel renders. */
+.tabbar {
   display: none;
 }
 
 @media (max-width: 44rem) {
-  .webview-nav {
+  .tabbar {
     position: fixed;
-    right: 1rem;
-    top: 6.4rem;
-    z-index: 40;
+    left: 50%;
+    bottom: 1rem;
+    transform: translateX(-50%);
+    z-index: 45;
+    width: min(94vw, 26rem);
     display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
+    align-items: center;
+    justify-content: space-around;
+    gap: 0.2rem;
+    padding: 0.5rem 0.4rem;
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 1.4rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.16);
   }
 }
 
-.webview-btn {
-  width: 2.8rem;
-  height: 2.8rem;
+.tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  background: none;
+  border: 0;
+  padding: 0.35rem 0;
+  font: inherit;
+  font-size: 0.68rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tab-item svg {
+  width: 1.35rem;
+  height: 1.35rem;
+}
+
+.tab-item:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+.tab-item:not(:disabled):active {
+  color: var(--ink);
+}
+
+/* Home: raised green circle, centre accent like the reference's + button. */
+.tab-center {
+  flex: 0 0 auto;
+  width: 3.2rem;
+  height: 3.2rem;
+  margin-top: -1.4rem;
   display: grid;
   place-items: center;
-  background: #fff;
-  color: var(--ink);
-  border: 1px solid var(--line);
+  background: var(--green);
+  color: #fff;
+  border: 4px solid #fff;
   border-radius: 50%;
   cursor: pointer;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 6px 16px rgba(108, 194, 74, 0.4);
 }
 
-.webview-btn:active {
-  background: var(--panel);
+.tab-center svg {
+  width: 1.5rem;
+  height: 1.5rem;
 }
 
-.webview-btn svg {
-  width: 1.2rem;
-  height: 1.2rem;
+/* Keep the back-to-top button clear of the tab bar on mobile. */
+@media (max-width: 44rem) {
+  .back-to-top {
+    bottom: 5.6rem;
+  }
+  /* Reserve space so the fixed tab bar never covers footer/page content. */
+  .footer-bottom {
+    padding-bottom: 5rem;
+  }
 }
 
 /* Burger: hidden on desktop, shown at the mobile breakpoint. */
