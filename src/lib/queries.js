@@ -14,6 +14,19 @@ export async function getCategories() {
   )
 }
 
+// Brands that have a logo — for the home-page marquee. Skips the placeholder
+// "Generic" brand and any without a logo_url.
+export async function getBrands() {
+  return unwrap(
+    await supabase
+      .from('brands')
+      .select('id, name, slug, logo_url')
+      .not('logo_url', 'is', null)
+      .order('position')
+      .order('name')
+  )
+}
+
 // Listing shape: enough to render a tile. Variations aren't fetched here —
 // the price range on the product row is maintained by a trigger, so listings
 // never need to join them.

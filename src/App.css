@@ -818,6 +818,167 @@ main {
   gap: 2rem;
 }
 
+/* Infinite brand-logo marquee. Track is duplicated in markup; translating it
+   -50% loops seamlessly because the second copy is identical to the first. */
+/* Full-bleed, to match the full-width video hero directly above it. */
+.brand-marquee {
+  width: 100%;
+  margin: 2.5rem 0;
+  padding: 1.5rem 0;
+  overflow: hidden;
+  /* Fade the edges so logos slide in/out softly rather than clipping. */
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 5%, #000 95%, transparent);
+}
+
+.brand-track {
+  display: flex;
+  align-items: center;
+  gap: 4.5rem;
+  width: max-content;
+  animation: brand-scroll 30s linear infinite;
+}
+
+.brand-marquee:hover .brand-track {
+  animation-play-state: paused;
+}
+
+@keyframes brand-scroll {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.brand-logo {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  height: 5.5rem;
+}
+
+.brand-logo img {
+  max-height: 5.5rem;
+  max-width: 13rem;
+  width: auto;
+  object-fit: contain;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-track {
+    animation: none;
+    /* Static: let the row scroll manually instead of animating. */
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+/* Mobile: desktop logo/gap sizes leave huge empty space on a narrow screen.
+   Scale everything down so ~3 logos show without a big band. */
+@media (max-width: 44rem) {
+  .brand-marquee {
+    padding: 0.8rem 0;
+    margin: 1.5rem 0;
+  }
+  .brand-track {
+    gap: 2.2rem;
+  }
+  .brand-logo,
+  .brand-logo img {
+    height: 3rem;
+    max-height: 3rem;
+  }
+  .brand-logo img {
+    max-width: 7.5rem;
+  }
+}
+
+/* Full-width looping video band with overlaid copy. Sits at the top of the
+   home page, flush under the sticky header. */
+.video-band {
+  position: relative;
+  margin: 0 0 3rem;
+  min-height: 30rem;
+  display: grid;
+  align-items: center;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* Desktop: the hero video + the brand marquee together fill exactly one
+   screen. Rather than juggle magic numbers, the two are wrapped in a
+   100vh-minus-header flex column and the video takes whatever height the
+   marquee doesn't — self-correcting, no gap. */
+@media (min-width: 60rem) {
+  .home-hero-block {
+    height: calc(100vh - 76px); /* 76px = sticky header */
+    display: flex;
+    flex-direction: column;
+  }
+  .home-hero-block .video-band {
+    flex: 1;
+    min-height: 0;
+    margin-bottom: 0;
+  }
+  .home-hero-block .brand-marquee {
+    flex: 0 0 auto;
+    margin: 0 auto;
+  }
+}
+
+.video-band-media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -2;
+}
+
+/* Scrim so the copy stays legible over any frame. */
+.video-band::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.3) 45%,
+    rgba(0, 0, 0, 0.1) 100%
+  );
+}
+
+.video-band-inner {
+  max-width: var(--max);
+  width: 100%;
+  margin: 0 auto;
+  padding: 3rem 1.5rem;
+  color: #fff;
+}
+
+.video-band-inner .eyebrow {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.video-band-inner h2 {
+  font-size: clamp(1.8rem, 4vw, 2.6rem);
+  font-weight: 600;
+  margin: 0 0 1rem;
+  max-width: 18ch;
+}
+
+.video-band-text {
+  color: rgba(255, 255, 255, 0.9);
+  line-height: 1.8;
+  max-width: 30rem;
+  margin: 0 0 1.8rem;
+}
+
+.video-band-inner .btn-solid {
+  background: #fff;
+  color: var(--ink);
+}
+
 .eyebrow {
   font-size: 0.7rem;
   letter-spacing: 0.18em;

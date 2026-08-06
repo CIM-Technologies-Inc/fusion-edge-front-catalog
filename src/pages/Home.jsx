@@ -1,68 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { getProducts, getCategories, formatPriceRange, imagesFor } from '../lib/queries'
+import { getProducts, getCategories, getBrands } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import ProductCard from '../components/ProductCard'
-import {
-  SkeletonHero,
-  SkeletonTiles,
-  SkeletonCategoryTiles,
-} from '../components/Skeleton'
+import { SkeletonTiles, SkeletonCategoryTiles } from '../components/Skeleton'
 
-function Hero({ products, loading }) {
-  const [active, setActive] = useState(0)
-
-  // `products` here is already the featured list (fetched with featured:true),
-  // so the carousel shows featured products only. No fallback: if nothing is
-  // featured, the hero renders nothing.
-  const slides = products.slice(0, 4)
-
-  if (loading) return <SkeletonHero />
-  if (!slides.length) return null
-
-  const slide = slides[Math.min(active, slides.length - 1)]
-  const image = imagesFor(slide, null)[0]
-
-  return (
-    <section className="hero">
-      <div className="hero-copy fade-up">
-        <p className="hero-no">{slide.sku ?? `No.${String(active + 1).padStart(3, '0')}`}</p>
-        <h1 className="hero-title">{slide.name}</h1>
-        <div className="hero-price">
-          <span>{formatPriceRange(slide)}</span>
-          <span className="vat">VAT included</span>
-        </div>
-        <p className="hero-dims">{slide.short_description ?? ''}</p>
-        <Link to={`/product/${slide.slug}`} className="btn-outline">
-          + Discover Now
-        </Link>
-      </div>
-
-      <div className="hero-art fade-in">
-        {image ? (
-          <img src={image.url} alt={image.alt ?? slide.name} />
-        ) : (
-          <span className="art-empty" aria-hidden="true" />
-        )}
-      </div>
-
-      {slides.length > 1 && (
-        <div className="dots">
-          {slides.map((s, i) => (
-            <button
-              key={s.id}
-              type="button"
-              className={i === active ? 'dot on' : 'dot'}
-              aria-label={`Show ${s.name}`}
-              aria-current={i === active}
-              onClick={() => setActive(i)}
-            />
-          ))}
-        </div>
-      )}
-    </section>
-  )
-}
 
 function CategoryTiles() {
   const { data: categories, loading } = useAsync(() => getCategories(), [])
@@ -91,28 +33,58 @@ function CategoryTiles() {
   )
 }
 
-function Feature() {
-  // Section disabled: the "Shell Chair Collection" copy is placeholder text
-  // and the panel has no artwork. Delete the early return to restore it.
-  return null
+// Full-width band with a looping background video and overlaid copy.
+// autoplay requires muted; playsInline keeps it inline on iOS instead of
+// going fullscreen.
+// Infinite brand-logo marquee. The track is rendered twice back-to-back and
+// translated by -50%, so when the first copy scrolls off the second is already
+// in place — a seamless loop with no jump.
+function BrandMarquee() {
+  const { data: brands } = useAsync(() => getBrands(), [])
+  if (!brands?.length) return null
 
-  // eslint-disable-next-line no-unreachable
+  const track = [...brands, ...brands]
+
   return (
-    <section className="feature">
-      <div className="feature-copy">
+    <section className="brand-marquee" aria-label="Brands we carry">
+      <div className="brand-track">
+        {track.map((brand, i) => (
+          <span className="brand-logo" key={`${brand.id}-${i}`}>
+            <img
+              src={brand.logo_url}
+              alt={brand.name}
+              loading="lazy"
+              aria-hidden={i >= brands.length}
+            />
+          </span>
+        ))}
+      </div>
+    </section>
+  )
+}
+
+function VideoBand() {
+  return (
+    <section className="video-band">
+      <video
+        className="video-band-media"
+        src="https://txgxonwcdrxayurzjcwb.supabase.co/storage/v1/object/public/assets/cover-hero.mp4"
+        autoPlay
+        muted
+        loop
+        playsInline
+        aria-hidden="true"
+      />
+      <div className="video-band-inner">
         <p className="eyebrow">#FURNITURES</p>
-        <h2>Shell Chair Collection</h2>
-        <p className="feature-text">
+        <h2>Crafted for modern living</h2>
+        <p className="video-band-text">
           Since 1991, Fusion Edge has been a purveyor of quality modern
-          furniture. With 20 international brands and counting across 2 shops,
-          we bring considered design to everyday living.
+          furniture — considered design for everyday living.
         </p>
         <Link to="/shop" className="btn-solid">
           Shop Now
         </Link>
-      </div>
-      <div className="feature-art">
-        <span className="script">Crafted</span>
       </div>
     </section>
   )
@@ -182,18 +154,13 @@ export default function Home() {
   const { data, loading, error } = useAsync(() => getProducts({ limit: 12 }), [])
   const products = data ?? []
 
-  // Featured products for the hero are fetched on their own so a featured
-  // product is never missed just because it isn't among the newest 12.
-  const { data: featuredData, loading: featuredLoading } = useAsync(
-    () => getProducts({ featured: true, limit: 4 }),
-    []
-  )
-
   return (
     <>
-      <Hero products={featuredData ?? []} loading={featuredLoading} />
+      <div className="home-hero-block">
+        <VideoBand />
+        <BrandMarquee />
+      </div>
       <CategoryTiles />
-      <Feature />
       <Trending products={products} loading={loading} error={error} />
       <SearchBar />
     </>
