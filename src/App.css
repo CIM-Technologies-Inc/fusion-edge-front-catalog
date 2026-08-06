@@ -2357,17 +2357,15 @@ main {
 
 @media (max-width: 44rem) {
   .hero,
-  .cat-tiles,
   .feature,
   .detail {
     grid-template-columns: 1fr;
   }
-  /* Undo the rowspan layout so tiles simply stack on mobile. */
+  /* cat-tiles keeps its desktop 1:2 layout on mobile (tall left tile + two
+     stacked right), just tighter. */
   .cat-tiles {
-    grid-template-rows: none;
-  }
-  .cat-tiles > .cat-tile:first-child {
-    grid-row: auto;
+    gap: 0.6rem;
+    padding: 1rem;
   }
   /* Stacked: the 3rem gap is column spacing that becomes an oversized gap
      between gallery and product info once they're one on top of the other. */
