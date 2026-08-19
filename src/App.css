@@ -96,6 +96,14 @@ main {
   height: 2.9rem;
 }
 
+/* Footer uses a dedicated dark-ground logo asset (transparent PNG), so no
+   inversion needed. */
+.footer-logo-img {
+  display: block;
+  width: auto;
+  height: 2.6rem;
+}
+
 
 .topbar-actions {
   justify-self: end;

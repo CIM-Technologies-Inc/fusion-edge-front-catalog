@@ -254,7 +254,13 @@ function Footer() {
     <footer className="footer">
       <div className="footer-inner">
         <Link to="/" className="logo light" aria-label="Fusion Edge home">
-          <Logo/>
+          <img
+            src="/log-fusion-dark.png"
+            alt="Fusion Edge"
+            className="footer-logo-img"
+            width="720"
+            height="157"
+          />
         </Link>
         <address>
           706 SEDCCO 1 Building, 120 Rada cor. Legaspi St.,
