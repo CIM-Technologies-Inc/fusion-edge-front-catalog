@@ -139,7 +139,7 @@ function AttributePicker({ attribute, value, onChange }) {
 //
 // `selection` is { attributeId: termId } from the pickers. Passing it makes
 // the variation values update as the shopper selects.
-function dataAttributesFor(product, selection = {}) {
+function dataAttributesFor(product, selection = {}, variation = null) {
   const out = {}
   for (const attr of product.attributes) {
     if (!attr.terms.length) continue
@@ -167,6 +167,19 @@ function dataAttributesFor(product, selection = {}) {
       out[name] = attr.terms.map((t) => t.name).join(',')
     }
   }
+
+  // Free-typed per-variation attributes (variation_meta): once a variation is
+  // selected, emit each with its values comma-joined. A name already starting
+  // with "data-" is used verbatim (e.g. the admin typed "data-cim-tile-w");
+  // otherwise it's slugged and prefixed — "Material" → data-cim-material.
+  for (const m of variation?.meta ?? []) {
+    const raw = m.name.trim()
+    if (!raw) continue
+    const slug = raw.toLowerCase().replace(/\s+/g, '-')
+    const key = raw.startsWith('data-') ? slug : `data-cim-${slug}`
+    out[key] = m.values.join(',')
+  }
+
   return out
 }
 
@@ -612,7 +625,7 @@ export default function Product() {
           key={variation?.id ?? 'default'}
           images={gallery}
           name={product.name}
-          figureProps={dataAttributesFor(product, selection)}
+          figureProps={dataAttributesFor(product, selection, variation)}
         />
       </div>
 

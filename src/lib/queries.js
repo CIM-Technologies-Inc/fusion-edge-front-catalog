@@ -72,7 +72,8 @@ export async function getProductBySlug(slug) {
         ),
         variations(
           id, sku, price_cents, sale_price_cents, in_stock, position,
-          terms:variation_terms(attribute_id, term_id)
+          terms:variation_terms(attribute_id, term_id),
+          meta:variation_meta(name, value, position)
         )
       `
       )
@@ -82,6 +83,17 @@ export async function getProductBySlug(slug) {
   )
 
   return normalizeProduct(product)
+}
+
+// variation_meta rows → ordered [{ name, values: [..] }], grouping rows that
+// share a name and preserving position order.
+function groupMeta(rows) {
+  const byName = new Map()
+  for (const row of (rows ?? []).slice().sort((a, b) => a.position - b.position)) {
+    if (!byName.has(row.name)) byName.set(row.name, [])
+    byName.get(row.name).push(row.value)
+  }
+  return [...byName].map(([name, values]) => ({ name, values }))
 }
 
 // Postgrest returns nested rows in insertion order; sort and flatten here so
@@ -116,6 +128,9 @@ function normalizeProduct(p) {
       termsByAttribute: Object.fromEntries(
         (v.terms ?? []).map((t) => [t.attribute_id, t.term_id])
       ),
+      // Free-typed per-variation attributes, grouped { name: [values] }.
+      // "Material: Oak, Teak" arrives as two rows sharing a name.
+      meta: groupMeta(v.meta),
     }))
 
   return { ...normalizeImages(p), attributes, variations }
