@@ -185,7 +185,7 @@ function dataAttributesFor(product, selection = {}, variation = null) {
 
 // Main image with thumbnails beneath. A single image renders alone — one
 // thumbnail under one photo is just noise.
-function Gallery({ images, name, figureProps }) {
+function Gallery({ images, name, figureProps, swatchFallback }) {
   const [index, setIndex] = useState(0)
 
   // Selecting a different variation swaps the image set, so an index held
@@ -193,6 +193,22 @@ function Gallery({ images, name, figureProps }) {
   // a stale value.
   const safe = Math.min(index, Math.max(images.length - 1, 0))
   const main = images[safe]
+
+  // Selected variation has no image of its own → paint its colour swatch as
+  // the main panel instead of falling back to the product image.
+  if (swatchFallback) {
+    return (
+      <div className="gallery">
+        <figure
+          className="gallery-main ct-media-container gallery-swatch"
+          style={{ background: swatchFallback.color }}
+          role="img"
+          aria-label={`${name} in ${swatchFallback.name}`}
+          {...figureProps}
+        />
+      </div>
+    )
+  }
 
   if (!images.length) {
     return (
@@ -595,6 +611,22 @@ export default function Product() {
     [product, variation]
   )
 
+  // If the selected variation has no image of its own, fall back to showing
+  // its colour swatch as the main panel. Only when a colour attribute is
+  // actually chosen — otherwise the gallery shows the product image as usual.
+  const swatchFallback = useMemo(() => {
+    if (!product || !variation) return null
+    const hasOwnImage = product.images.some((i) => i.variation_id === variation.id)
+    if (hasOwnImage) return null
+    // Find the selected term of a colour-display attribute.
+    for (const attr of product.attributes) {
+      if (attr.display_type !== 'color') continue
+      const term = attr.terms.find((t) => t.id === selection[attr.id])
+      if (term?.swatch) return { color: term.swatch, name: term.name }
+    }
+    return null
+  }, [product, variation, selection])
+
   if (loading) {
     return (
       <>
@@ -625,6 +657,7 @@ export default function Product() {
           key={variation?.id ?? 'default'}
           images={gallery}
           name={product.name}
+          swatchFallback={swatchFallback}
           figureProps={dataAttributesFor(product, selection, variation)}
         />
       </div>
