@@ -665,7 +665,7 @@ export default function Product() {
       {/* Mobile only: sits between the stacked gallery and the product info,
           right where the drag guidance is most useful. The desktop copy lives
           inside .detail-body below. */}
-      <RevitStrip className="revit-strip-mobile" />
+      {/* <RevitStrip className="revit-strip-mobile" /> */}
 
       <div className="detail-body">
         <h1>{product.name}</h1>
@@ -734,7 +734,7 @@ export default function Product() {
           )}
         </dl>
 
-        <RevitStrip className="revit-strip-desktop" />
+        {/* <RevitStrip className="revit-strip-desktop" /> */}
 
         {/* <ShareRow name={product.name} /> */}
       </div>
