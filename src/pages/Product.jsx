@@ -682,14 +682,17 @@ export default function Product() {
         <Stars value={0} count={0} />
 
         <p className="detail-price">
-          {variation ? (
+          {variation || product.kind !== 'variable' ? (
+            // A resolved variation, or a simple product: show the discounted
+            // price with the regular price struck through when on sale.
             <>
-              {variation.sale_price_cents && (
-                <s className="was">{formatPrice(variation.price_cents)}</s>
+              {active.sale_price_cents && (
+                <s className="was">{formatPrice(active.price_cents)}</s>
               )}
-              {formatPrice(effectivePrice(variation))}
+              {formatPrice(effectivePrice(active))}
             </>
           ) : (
+            // Variable product with no variation chosen yet: show the range.
             formatPriceRange(product)
           )}
         </p>
