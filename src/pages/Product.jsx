@@ -276,6 +276,29 @@ function Stars({ value = 0, count = 0 }) {
   )
 }
 
+// Price for the active row (a chosen variation or a simple product). On sale:
+// the discounted price leads, the regular price sits struck-through beside it,
+// and a warm badge shows the percentage saved. Otherwise just the one price.
+function PriceBlock({ reg, sale }) {
+  const now = effectivePrice({ price_cents: reg, sale_price_cents: sale })
+  if (now == null) return null
+
+  const onSale = sale != null && reg != null && sale < reg
+  const off = onSale ? Math.round((1 - sale / reg) * 100) : 0
+
+  return (
+    <p className={onSale ? 'detail-price on-sale' : 'detail-price'}>
+      <span className="price-now">{formatPrice(now)}</span>
+      {onSale && (
+        <>
+          <s className="was">{formatPrice(reg)}</s>
+          {off > 0 && <span className="save-badge">Save {off}%</span>}
+        </>
+      )}
+    </p>
+  )
+}
+
 // Currently unused — the share row is commented out in the product page.
 // Kept so it can be re-enabled without rebuilding it.
 // eslint-disable-next-line no-unused-vars
@@ -681,21 +704,15 @@ export default function Product() {
         <h1>{product.name}</h1>
         <Stars value={0} count={0} />
 
-        <p className="detail-price">
-          {variation || product.kind !== 'variable' ? (
-            // A resolved variation, or a simple product: show the discounted
-            // price with the regular price struck through when on sale.
-            <>
-              {active.sale_price_cents && (
-                <s className="was">{formatPrice(active.price_cents)}</s>
-              )}
-              {formatPrice(effectivePrice(active))}
-            </>
-          ) : (
-            // Variable product with no variation chosen yet: show the range.
-            formatPriceRange(product)
-          )}
-        </p>
+        {variation || product.kind !== 'variable' ? (
+          // A resolved variation, or a simple product: show the discounted
+          // price prominently, with the regular price struck through and a
+          // savings badge when on sale.
+          <PriceBlock reg={active.price_cents} sale={active.sale_price_cents} />
+        ) : (
+          // Variable product with no variation chosen yet: show the range.
+          <p className="detail-price">{formatPriceRange(product)}</p>
+        )}
 
         {product.short_description && (
           <p className="detail-short">{product.short_description}</p>

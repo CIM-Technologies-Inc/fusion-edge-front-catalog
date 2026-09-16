@@ -1581,15 +1581,48 @@ main {
 
 
 .detail-price {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin: 0 0 1rem;
   font-size: 1.3rem;
   font-weight: 600;
-  margin: 0 0 1rem;
+}
+
+/* The price actually charged — the largest, darkest number on the row. */
+.price-now {
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* On sale, the current price takes the warm accent so the discount reads at
+   a glance. */
+.detail-price.on-sale .price-now {
+  color: var(--sale);
 }
 
 .was {
-  color: var(--muted);
+  font-size: 1.05rem;
   font-weight: 400;
-  margin-right: 0.6rem;
+  color: var(--muted);
+  text-decoration-thickness: 1px;
+}
+
+/* Percentage-saved chip, in the same warm family as the sale price. */
+.save-badge {
+  align-self: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sale) 14%, transparent);
+  color: var(--sale);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  line-height: 1.4;
 }
 
 .detail-short {
