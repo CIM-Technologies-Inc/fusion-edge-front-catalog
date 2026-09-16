@@ -168,6 +168,16 @@ function dataAttributesFor(product, selection = {}, variation = null) {
     }
   }
 
+  // Price → figure. The active row is the chosen variation, else the product.
+  // Regular price is the list price; discounted price is emitted only when a
+  // sale price is actually set. Values are peso amounts (cents / 100), not
+  // formatted strings, so the Revit side gets a plain number.
+  const priced = variation ?? product
+  const reg = priced?.price_cents
+  const dis = priced?.sale_price_cents
+  if (reg != null) out['data-cim-reg-price'] = (reg / 100).toString()
+  if (dis != null) out['data-cim-dis-price'] = (dis / 100).toString()
+
   // Free-typed per-variation attributes (variation_meta): once a variation is
   // selected, emit each with its values comma-joined. A name already starting
   // with "data-" is used verbatim (e.g. the admin typed "data-cim-tile-w");
