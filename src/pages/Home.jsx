@@ -158,7 +158,7 @@ export default function Home() {
     <>
       <div className="home-hero-block">
         <VideoBand />
-        <BrandMarquee />
+        {/* <BrandMarquee /> */}
       </div>
       <CategoryTiles />
       <Trending products={products} loading={loading} error={error} />

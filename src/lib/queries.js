@@ -61,6 +61,7 @@ export async function getProductBySlug(slug) {
         `
         *,
         category:categories(id, name, slug),
+        brand:brands(id, name, slug),
         images:product_images(id, url, alt, position, variation_id),
         attributes:product_attributes(
           id, position, used_for_variations, default_term_id,

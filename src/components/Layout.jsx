@@ -20,7 +20,7 @@ function useNavItems() {
 
   return [
     { label: 'Home', to: '/', caret: true },
-    { label: 'Shop', to: '/products', caret: true },
+    { label: 'Product Catalog', to: '/products', caret: true },
     { label: 'Category', to: '/shop', children: catChildren },
     { label: 'Contact', to: null },
   ]

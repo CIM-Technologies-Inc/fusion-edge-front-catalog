@@ -168,6 +168,10 @@ function dataAttributesFor(product, selection = {}, variation = null) {
     }
   }
 
+  // Brand → figure. Product-level, so it's the same whatever variation is
+  // chosen. Emitted only when the product has a brand assigned.
+  if (product.brand?.name) out['data-cim-brand'] = product.brand.name
+
   // Price → figure. The active row is the chosen variation, else the product.
   // Regular price is the list price; discounted price is emitted only when a
   // sale price is actually set. Values are peso amounts (cents / 100), not
