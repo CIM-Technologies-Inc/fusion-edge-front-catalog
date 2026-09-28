@@ -179,7 +179,7 @@ function dataAttributesFor(product, selection = {}, variation = null) {
   const priced = variation ?? product
   const reg = priced?.price_cents
   const dis = priced?.sale_price_cents
-  if (reg != null) out['data-cim-reg-price'] = (reg / 100).toString()
+  if (reg != null) out['data-cim-price'] = (reg / 100).toString()
   if (dis != null) out['data-cim-dis-price'] = (dis / 100).toString()
 
   // Free-typed per-variation attributes (variation_meta): once a variation is
