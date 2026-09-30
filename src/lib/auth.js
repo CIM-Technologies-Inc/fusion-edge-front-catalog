@@ -10,7 +10,36 @@ export function useAuth() {
   return useContext(AuthContext)
 }
 
+// This storefront shares one Supabase project with the admin panel, so the same
+// accounts exist in both. Only CUSTOMER accounts may use the storefront:
+// role = 'customer', no admin role assigned (role_id null), and not an admin.
+export const NOT_CUSTOMER_MESSAGE =
+  "This account can't shop here. Staff accounts sign in through the admin panel."
+
+/**
+ * Whether the given user id is a customer account (allowed on the storefront).
+ * Reads the user's own profiles row (RLS permits reading your own row). If the
+ * row can't be read, treat as NOT a customer — fail closed.
+ */
+export async function isCustomerAccount(userId) {
+  if (!userId) return false
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('is_admin, role, role_id')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (error || !data) return false
+  return (
+    data.is_admin !== true &&
+    data.role_id == null &&
+    (data.role == null || data.role === 'customer')
+  )
+}
+
 export function signUp(email, password, fullName) {
+  // New signups are always customers (the DB defaults role to 'customer' and
+  // leaves role_id null), so no extra check is needed here.
   return supabase.auth.signUp({
     email,
     password,
@@ -18,8 +47,18 @@ export function signUp(email, password, fullName) {
   })
 }
 
-export function signIn(email, password) {
-  return supabase.auth.signInWithPassword({ email, password })
+export async function signIn(email, password) {
+  const result = await supabase.auth.signInWithPassword({ email, password })
+  if (result.error) return result
+
+  // Reject non-customer (staff/admin) accounts: sign them straight back out so
+  // no half-authenticated staff session lingers on the storefront.
+  const userId = result.data?.user?.id
+  if (!(await isCustomerAccount(userId))) {
+    await supabase.auth.signOut()
+    return { data: null, error: { message: NOT_CUSTOMER_MESSAGE } }
+  }
+  return result
 }
 
 export function signOut() {

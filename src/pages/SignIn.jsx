@@ -11,13 +11,28 @@ export default function SignIn() {
   async function submit(e) {
     e.preventDefault()
     setStatus({ busy: true })
-    const { error } =
-      mode === 'signin'
-        ? await signIn(form.email, form.password)
-        : await signUp(form.email, form.password, form.fullName)
 
+    if (mode === 'signin') {
+      const { error } = await signIn(form.email, form.password)
+      if (error) return setStatus({ error: error.message })
+      return navigate('/')
+    }
+
+    // Sign up. Email confirmation is on, so a new customer has NO session yet —
+    // they must click the link in their email before they can sign in. Show a
+    // "check your email" message instead of navigating. (If confirmation is
+    // ever turned off, Supabase returns a session and we send them in.)
+    const { data, error } = await signUp(
+      form.email,
+      form.password,
+      form.fullName
+    )
     if (error) return setStatus({ error: error.message })
-    navigate('/')
+    if (data?.session) return navigate('/')
+    setStatus({
+      info: `Almost there — we sent a confirmation link to ${form.email}. Click it to activate your account, then sign in.`,
+    })
+    setMode('signin')
   }
 
   return (
@@ -57,11 +72,15 @@ export default function SignIn() {
         {mode === 'signin' ? 'Sign in' : 'Sign up'}
       </button>
       {status?.error && <p className="error">{status.error}</p>}
+      {status?.info && <p className="info">{status.info}</p>}
 
       <button
         type="button"
         className="linklike"
-        onClick={() => setMode(mode === 'signin' ? 'signup' : 'signin')}
+        onClick={() => {
+          setStatus(null)
+          setMode(mode === 'signin' ? 'signup' : 'signin')
+        }}
       >
         {mode === 'signin'
           ? 'Need an account? Sign up'
