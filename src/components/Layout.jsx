@@ -206,8 +206,94 @@ function SearchBox() {
   )
 }
 
-function Header({ onOpenMenu, menuOpen }) {
+// Signed-in account control: the user icon (with a small "online" dot) opens a
+// dropdown with the account's name/email and links to their pages. Signed out,
+// the same slot is a plain link to /signin. This is what makes the header
+// visibly reflect a successful login.
+function AccountMenu() {
   const { user } = useAuth()
+  const navigate = useNavigate()
+  const [open, setOpen] = useState(false)
+  const ref = useRef(null)
+
+  // Close on outside click / Escape while open.
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e) => {
+      if (ref.current && !ref.current.contains(e.target)) setOpen(false)
+    }
+    const onKey = (e) => e.key === 'Escape' && setOpen(false)
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
+  }, [open])
+
+  if (!user) {
+    return (
+      <Link to="/signin" aria-label="Sign in">
+        <UserIcon />
+      </Link>
+    )
+  }
+
+  // full_name from signup metadata; fall back to the email's local part.
+  const name =
+    user.user_metadata?.full_name?.trim() || user.email?.split('@')[0] || 'Account'
+
+  const go = (to) => {
+    setOpen(false)
+    navigate(to)
+  }
+
+  return (
+    <div className="account" ref={ref}>
+      <button
+        type="button"
+        className="account-btn"
+        aria-label="Account menu"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        onClick={() => setOpen((o) => !o)}
+      >
+        <span className="account-avatar">
+          <UserIcon />
+          <span className="account-dot" aria-hidden="true" />
+        </span>
+      </button>
+
+      {open && (
+        <div className="account-menu" role="menu">
+          <div className="account-head">
+            <strong>{name}</strong>
+            {user.email && <small>{user.email}</small>}
+          </div>
+          <button type="button" role="menuitem" onClick={() => go('/dashboard')}>
+            Dashboard
+          </button>
+          <button type="button" role="menuitem" onClick={() => go('/library')}>
+            Your library
+          </button>
+          <button
+            type="button"
+            role="menuitem"
+            className="account-signout"
+            onClick={() => {
+              setOpen(false)
+              signOut()
+            }}
+          >
+            Sign out
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+function Header({ onOpenMenu, menuOpen }) {
   const items = useNavItems()
 
   return (
@@ -234,15 +320,7 @@ function Header({ onOpenMenu, menuOpen }) {
           <Link to="/library" aria-label="Your library">
             <HeartIcon />
           </Link>
-          {user ? (
-            <button type="button" onClick={signOut} aria-label="Sign out">
-              <UserIcon />
-            </button>
-          ) : (
-            <Link to="/signin" aria-label="Account">
-              <UserIcon />
-            </Link>
-          )}
+          <AccountMenu />
         </div>
       </div>
     </header>

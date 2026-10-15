@@ -1,0 +1,94 @@
+/* Fusion Edge — brand tokens */
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+:root, [data-theme="light"] {
+  --surface: #f6f8fb;
+  --surface-raised: #ffffff;
+  --line: #dce3ed;
+  --line-strong: #7a8ba3;
+  --ink: #0b1b33;
+  --ink-muted: #5a6b82;
+  --fusion-navy: #0e4185;
+  --navy-deep: #0a2a57;
+  --brand-soft: #e6eef9;
+  --on-brand: #ffffff;
+  --edge-green: #74cc44;
+  --navy-ink: #0a2a57;
+  --edge-green-text: #2f7a16;
+  --green-soft: #eaf7e1;
+  --warning: #9a4a06;
+  --warning-soft: #fdf0dd;
+  --danger: #b4302a;
+  --danger-soft: #fbe7e5;
+  --focus: var(--fusion-navy);
+  --link: var(--fusion-navy);
+  --shadow-card: 0 1px 2px rgba(11,27,51,0.06);
+  --shadow-lift: 0 12px 28px rgba(14,65,133,0.22);
+}
+
+[data-theme="dark"] {
+  --surface: #0b1424;
+  --surface-raised: #121e33;
+  --line: #24324a;
+  --line-strong: #5d6f8a;
+  --ink: #e8eef7;
+  --ink-muted: #9aabc2;
+  --fusion-navy: #7ba7f0;
+  --navy-deep: #1e3f73;
+  --brand-soft: #13284a;
+  --on-brand: #0b1424;
+  --edge-green: #74cc44;
+  --navy-ink: #0a2a57;
+  --edge-green-text: #8ee05c;
+  --green-soft: #16301a;
+  --warning: #f5b041;
+  --warning-soft: #3a2709;
+  --danger: #ff7a6e;
+  --danger-soft: #3d1513;
+  --focus: var(--fusion-navy);
+  --link: var(--fusion-navy);
+  --shadow-card: 0 1px 2px rgba(0,0,0,0.4);
+  --shadow-lift: 0 12px 28px rgba(0,0,0,0.6);
+}
+
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+    --surface: #0b1424;
+    --surface-raised: #121e33;
+    --line: #24324a;
+    --line-strong: #5d6f8a;
+    --ink: #e8eef7;
+    --ink-muted: #9aabc2;
+    --fusion-navy: #7ba7f0;
+    --navy-deep: #1e3f73;
+    --brand-soft: #13284a;
+    --on-brand: #0b1424;
+    --edge-green: #74cc44;
+    --navy-ink: #0a2a57;
+    --edge-green-text: #8ee05c;
+    --green-soft: #16301a;
+    --warning: #f5b041;
+    --warning-soft: #3a2709;
+    --danger: #ff7a6e;
+    --danger-soft: #3d1513;
+    --focus: var(--fusion-navy);
+    --link: var(--fusion-navy);
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.4);
+    --shadow-lift: 0 12px 28px rgba(0,0,0,0.6);
+} }
+
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --radius-sm: 3px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+  --font-display: Montserrat, "Segoe UI", system-ui, sans-serif;
+  --font-sans: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, Menlo, monospace;
+}

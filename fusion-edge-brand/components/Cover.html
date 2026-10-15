@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Fusion Edge</title>
+<style>
+  html, body { margin:0; height:100%; }
+  body { background:var(--surface); color:var(--ink); font-family:var(--font-sans); overflow:hidden; }
+  .cover { position:relative; height:288px; overflow:hidden; }
+  .art { position:absolute; top:0; left:480px; width:480px; height:288px; overflow:hidden; }
+  .art svg { display:block; width:480px; height:288px; }
+  .navy { fill:var(--fusion-navy); }
+  .deep { fill:var(--navy-deep); }
+  .tint { fill:var(--brand-soft); }
+  .green { fill:var(--edge-green); }
+  .blk { rx:var(--radius-md); }
+  .plus { fill:var(--edge-green); }
+  .plus.cut { fill:var(--brand-soft); }
+  .words { position:absolute; left:var(--space-8); bottom:var(--space-6); max-width:440px; }
+  .name { margin:0; font-family:var(--font-display); font-size:104px; line-height:.95; font-weight:700; letter-spacing:-.02em; color:var(--ink); }
+  .tag { margin:var(--space-3) 0 0 4px; font-family:var(--font-mono); font-size:13px; line-height:20px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-muted); }
+</style>
+<link rel="stylesheet" href="../fusion-edge-tokens.css"><link rel="stylesheet" href="../fusion-edge-components.css"></head>
+<body>
+<div class="cover">
+<div class="art" aria-hidden="true">
+<svg viewBox="0 0 480 288" width="480" height="288">
+<!--
+  blocks      fusion-navy 176×272 slab bled off the top (the brand) · brand-soft 112×80 (tint) · edge-green 112×136 (the spark, the "EDGE") · navy-deep 160×272 bleeding off the right — ≈45% of 960×288
+  arrangement one tall navy slab and one deep slab bracketing a stacked tint/green pair — the logo's FUSION | EDGE split, navy heavy, green small but bright
+  pattern     plus grid, from "precise, technical, a 16px blueprint grid": pluses at a space-8 pitch in edge-green over navy-deep (28) and cut in brand-soft into the navy slab (8) — the drafting grid products land on
+  scales      sides in space-4 multiples; gutters space-4; pitch space-8; corners radius-md
+-->
+<rect class="navy blk" x="16" y="-8" width="176" height="272" rx="6"/>
+<rect class="tint blk" x="208" y="32" width="112" height="80" rx="6"/>
+<rect class="green blk" x="208" y="128" width="112" height="136" rx="6"/>
+<rect class="deep blk" x="336" y="-8" width="160" height="272" rx="6"/>
+<g class="plus">
+  <!-- 4 cols × 7 rows over navy-deep -->
+  <path d="M356 24h8v1.5h-8zM359.25 20.75h1.5v8h-1.5z M388 24h8v1.5h-8zM391.25 20.75h1.5v8h-1.5z M420 24h8v1.5h-8zM423.25 20.75h1.5v8h-1.5z M452 24h8v1.5h-8zM455.25 20.75h1.5v8h-1.5z
+  M356 56h8v1.5h-8zM359.25 52.75h1.5v8h-1.5z M388 56h8v1.5h-8zM391.25 52.75h1.5v8h-1.5z M420 56h8v1.5h-8zM423.25 52.75h1.5v8h-1.5z M452 56h8v1.5h-8zM455.25 52.75h1.5v8h-1.5z
+  M356 88h8v1.5h-8zM359.25 84.75h1.5v8h-1.5z M388 88h8v1.5h-8zM391.25 84.75h1.5v8h-1.5z M420 88h8v1.5h-8zM423.25 84.75h1.5v8h-1.5z M452 88h8v1.5h-8zM455.25 84.75h1.5v8h-1.5z
+  M356 120h8v1.5h-8zM359.25 116.75h1.5v8h-1.5z M388 120h8v1.5h-8zM391.25 116.75h1.5v8h-1.5z M420 120h8v1.5h-8zM423.25 116.75h1.5v8h-1.5z M452 120h8v1.5h-8zM455.25 116.75h1.5v8h-1.5z
+  M356 152h8v1.5h-8zM359.25 148.75h1.5v8h-1.5z M388 152h8v1.5h-8zM391.25 148.75h1.5v8h-1.5z M420 152h8v1.5h-8zM423.25 148.75h1.5v8h-1.5z M452 152h8v1.5h-8zM455.25 148.75h1.5v8h-1.5z
+  M356 184h8v1.5h-8zM359.25 180.75h1.5v8h-1.5z M388 184h8v1.5h-8zM391.25 180.75h1.5v8h-1.5z M420 184h8v1.5h-8zM423.25 180.75h1.5v8h-1.5z M452 184h8v1.5h-8zM455.25 180.75h1.5v8h-1.5z
+  M356 216h8v1.5h-8zM359.25 212.75h1.5v8h-1.5z M388 216h8v1.5h-8zM391.25 212.75h1.5v8h-1.5z M420 216h8v1.5h-8zM423.25 212.75h1.5v8h-1.5z M452 216h8v1.5h-8zM455.25 212.75h1.5v8h-1.5z"/>
+</g>
+<g class="plus cut">
+  <path d="M36 184h8v1.5h-8zM39.25 180.75h1.5v8h-1.5z M68 184h8v1.5h-8zM71.25 180.75h1.5v8h-1.5z M100 184h8v1.5h-8zM103.25 180.75h1.5v8h-1.5z M132 184h8v1.5h-8zM135.25 180.75h1.5v8h-1.5z
+  M36 216h8v1.5h-8zM39.25 212.75h1.5v8h-1.5z M68 216h8v1.5h-8zM71.25 212.75h1.5v8h-1.5z M100 216h8v1.5h-8zM103.25 212.75h1.5v8h-1.5z M132 216h8v1.5h-8zM135.25 212.75h1.5v8h-1.5z"/>
+</g>
+</svg>
+</div>
+<div class="words">
+  <h1 class="name">Fusion<br>Edge</h1>
+  <p class="tag">Knowledge flows. Intelligence grows.</p>
+</div>
+</div>
+</body>
+</html>

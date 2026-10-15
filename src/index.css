@@ -2,6 +2,10 @@
    Light-only by design: the brand palette is a fixed light scheme, so no
    prefers-color-scheme handling here. */
 
+/* fusion-edge-brand type system: Montserrat (display/headlines), IBM Plex Sans
+   (body text), IBM Plex Mono (dimensions, SKUs, tracked uppercase labels). */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
 :root {
   font-size: 17px;
   color-scheme: light;

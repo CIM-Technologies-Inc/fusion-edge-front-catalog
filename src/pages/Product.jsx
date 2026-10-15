@@ -535,9 +535,14 @@ function SaveButton({ product, variation }) {
 
   if (!user) {
     return (
-      <Alert tone="" icon="♡">
-        <Link to="/signin">Sign in</Link> to save this to your library.
-      </Alert>
+      <div className="save-signin">
+        <Link to="/signin" className="btn-save btn-save-signin">
+          <span aria-hidden="true">♡</span> Sign in to save
+        </Link>
+        <p className="save-signin-note">
+          Save products to your library to find them later.
+        </p>
+      </div>
     )
   }
 
@@ -559,7 +564,7 @@ function SaveButton({ product, variation }) {
     <>
       <button
         type="button"
-        className={saved ? 'btn-solid saved' : 'btn-solid'}
+        className={saved ? 'btn-save is-saved' : 'btn-save'}
         onClick={toggle}
         disabled={busy}
       >
@@ -679,7 +684,12 @@ export default function Product() {
     (a) => a.usedForVariations && !selection[a.id]
   )
   const active = variation ?? product
-  const out = !active.in_stock
+  // Stock is per-variation on variable products, so it's only known once a
+  // variation is resolved. A simple product carries its own stock. Before a
+  // variable product's options are picked, stock is unknown — don't claim
+  // out-of-stock off the parent row.
+  const isVariable = product.kind === 'variable'
+  const out = isVariable ? !!variation && !variation.in_stock : !product.in_stock
 
   return (
     <>
@@ -705,6 +715,9 @@ export default function Product() {
       {/* <RevitStrip className="revit-strip-mobile" /> */}
 
       <div className="detail-body">
+        {product.brand?.name && (
+          <span className="detail-maker">{product.brand.name}</span>
+        )}
         <h1>{product.name}</h1>
         <Stars value={0} count={0} />
 
@@ -753,7 +766,7 @@ export default function Product() {
           {(variation?.sku ?? product.sku) && (
             <div>
               <dt>SKU:</dt>
-              <dd>{variation?.sku ?? product.sku}</dd>
+              <dd className="mono-value">{variation?.sku ?? product.sku}</dd>
             </div>
           )}
           {product.category && (

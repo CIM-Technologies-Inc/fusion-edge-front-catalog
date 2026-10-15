@@ -1,0 +1,59 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+body { font-family: var(--font-sans); color: var(--ink); background: var(--surface); margin: 0; }
+.fe-row { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; padding: var(--space-4); }
+
+/* Button */
+.fe-btn { display: inline-flex; align-items: center; gap: var(--space-2); height: 40px; padding: 0 var(--space-4);
+  border-radius: var(--radius-md); border: 1px solid transparent; font: 600 14px/1 var(--font-sans); cursor: pointer; }
+.fe-btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.fe-btn--primary { background: var(--fusion-navy); color: var(--on-brand); }
+.fe-btn--secondary { background: var(--surface-raised); color: var(--fusion-navy); border-color: var(--line-strong); }
+.fe-btn--revit { background: var(--edge-green); color: var(--navy-ink); }
+.fe-btn--ghost { background: transparent; color: var(--fusion-navy); }
+.fe-btn svg { width: 18px; height: 18px; }
+
+/* Badge */
+.fe-badge { display: inline-flex; align-items: center; gap: var(--space-1); padding: 3px var(--space-2); border-radius: var(--radius-sm);
+  font: 500 11px/16px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; }
+.fe-badge--revit { background: var(--edge-green); color: var(--navy-ink); }
+.fe-badge--brand { background: var(--brand-soft); color: var(--fusion-navy); }
+.fe-badge--neutral { background: transparent; color: var(--ink-muted); border: 1px solid var(--line); }
+.fe-badge--warning { background: var(--warning-soft); color: var(--warning); }
+
+/* Product card */
+.fe-card { width: 260px; background: var(--surface-raised); border: 1px solid var(--line); border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card); overflow: hidden; }
+.fe-card--lifted { box-shadow: var(--shadow-lift); transform: rotate(-2deg); border-color: var(--fusion-navy); }
+.fe-card__media { position: relative; height: 150px; background-color: var(--brand-soft);
+  background-image: linear-gradient(var(--line) 1px, transparent 1px), linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: var(--space-4) var(--space-4); display: grid; place-items: center; }
+.fe-card__media .fe-badge { position: absolute; top: var(--space-3); left: var(--space-3); }
+.fe-card__body { padding: var(--space-4); display: grid; gap: var(--space-1); }
+.fe-card__maker { font: 500 11px/16px var(--font-mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-muted); }
+.fe-card__name { font: 600 17px/24px var(--font-sans); margin: 0; }
+.fe-card__spec { font: 400 13px/20px var(--font-mono); color: var(--ink-muted); }
+.fe-card__foot { display: flex; align-items: center; justify-content: space-between; padding: 0 var(--space-4) var(--space-4); }
+.fe-card__price { font: 600 15px/20px var(--font-sans); }
+.fe-handle { display: inline-flex; align-items: center; gap: var(--space-2); padding: 6px var(--space-3); border-radius: var(--radius-md);
+  background: var(--edge-green); color: var(--navy-ink); font: 600 13px/1 var(--font-sans); cursor: grab; border: 0; }
+.fe-handle svg { width: 14px; height: 14px; }
+
+/* Revit drop zone */
+.fe-drop { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); border-radius: var(--radius-md);
+  border: 1.5px dashed var(--line-strong); background: var(--surface-raised); font: 400 14px/20px var(--font-sans); color: var(--ink-muted); min-width: 280px; }
+.fe-drop strong { display: block; color: var(--ink); font-weight: 600; }
+.fe-drop svg { width: 24px; height: 24px; flex: none; }
+.fe-drop--over { border-color: var(--fusion-navy); background: var(--brand-soft); color: var(--fusion-navy); }
+.fe-drop--over strong { color: var(--fusion-navy); }
+.fe-drop--done { border-style: solid; border-color: var(--edge-green); background: var(--green-soft); color: var(--edge-green-text); }
+.fe-drop--done strong { color: var(--edge-green-text); }
+.fe-drop--warn { border-style: solid; border-color: var(--warning); background: var(--warning-soft); color: var(--warning); }
+.fe-drop--warn strong { color: var(--warning); }
+
+/* Spec table */
+.fe-spec { border-collapse: collapse; width: 100%; max-width: 440px; font: 400 14px/20px var(--font-sans); background: var(--surface-raised); }
+.fe-spec th, .fe-spec td { text-align: left; padding: var(--space-2) var(--space-3); border-bottom: 1px solid var(--line); }
+.fe-spec th { font-weight: 500; color: var(--ink-muted); width: 45%; }
+.fe-spec td { font-family: var(--font-mono); font-size: 13px; color: var(--ink); }
+.fe-spec caption { text-align: left; padding: 0 0 var(--space-2); font: 500 11px/16px var(--font-mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-muted); }

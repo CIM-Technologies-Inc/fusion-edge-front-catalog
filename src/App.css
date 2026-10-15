@@ -16,10 +16,26 @@
      separate from brand green, which reads as availability, not emphasis. */
   --sale: #f4762a;
 
-  /* Eina03 is not a system font: it only renders where a webfont is loaded.
-     Everything after it is the fallback chain, which is what most visitors
-     will actually see until the font files are added. */
-  --font: 'Eina03', 'Helvetica Neue', helvetica, arial, sans-serif;
+  /* fusion-edge-brand tokens, scoped for the product-card restyle. New names
+     (no clash with the legacy tokens above) so only the cards adopt the new
+     system for now. Values from fusion-edge-brand/fusion-edge-tokens.css. */
+  --fe-surface-raised: #ffffff;
+  --fe-brand-soft: #e6eef9;
+  --fe-line: #dce3ed;
+  --fe-ink: #0b1b33;
+  --fe-ink-muted: #5a6b82;
+  --fe-navy: #0e4185;
+  --fe-edge-green: #74cc44;
+  --fe-navy-ink: #0a2a57;
+  --fe-radius-md: 6px;
+  --fe-radius-sm: 3px;
+  --fe-shadow-card: 0 1px 2px rgba(11, 27, 51, 0.06);
+  --fe-font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+
+  /* fusion-edge-brand type system (loaded in index.css):
+     display = Montserrat for headlines, body = IBM Plex Sans for text. */
+  --font: 'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif;
+  --font-display: Montserrat, 'Segoe UI', system-ui, sans-serif;
 
   --max: 1200px;
 }
@@ -34,6 +50,15 @@ body {
   color: var(--ink);
   font-family: var(--font);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Headlines use the display face (Montserrat); body copy stays IBM Plex Sans.
+   Product-card names are intentionally sans (set in .tile h3) for legibility
+   on dense grids, so they override this. */
+h1,
+h2,
+h3 {
+  font-family: var(--font-display);
 }
 
 a {
@@ -122,6 +147,88 @@ main {
   color: inherit;
   display: inline-flex;
   align-items: center;
+}
+
+/* Account control: the user icon plus a signed-in dropdown. */
+.account {
+  position: relative;
+  display: inline-flex;
+}
+
+/* The green "online" dot sits on the user icon so the header reads as
+   logged-in at a glance. */
+.account-avatar {
+  position: relative;
+  display: inline-flex;
+}
+
+.account-dot {
+  position: absolute;
+  right: -2px;
+  bottom: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 0 2px #fff;
+}
+
+.account-menu {
+  position: absolute;
+  top: calc(100% + 0.7rem);
+  right: 0;
+  z-index: 70;
+  min-width: 220px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  padding: 0.4rem;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Signed-in identity block at the top of the menu. */
+.account-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  padding: 0.6rem 0.7rem 0.7rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 0.35rem;
+}
+
+.account-head strong {
+  font-size: 0.95rem;
+  color: var(--ink);
+}
+
+.account-head small {
+  font-size: 0.78rem;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-menu [role='menuitem'] {
+  width: 100%;
+  text-align: left;
+  padding: 0.55rem 0.7rem;
+  border-radius: 7px;
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.account-menu [role='menuitem']:hover {
+  background: var(--panel);
+}
+
+.account-menu .account-signout {
+  color: var(--sale);
+  margin-top: 0.15rem;
+  border-top: 1px solid var(--line);
+  border-radius: 0 0 7px 7px;
 }
 
 /* Header search overlay: the icon opens a centred bar over a dimmed backdrop. */
@@ -426,8 +533,9 @@ main {
   left: 0;
   bottom: 0;
   width: min(82vw, 20rem);
-  background: #fff;
-  box-shadow: 2px 0 24px rgba(0, 0, 0, 0.15);
+  background: var(--fe-surface-raised);
+  border-right: 1px solid var(--fe-line);
+  box-shadow: 2px 0 24px rgba(14, 65, 133, 0.16);
   padding: 1.2rem 1.4rem;
   display: flex;
   flex-direction: column;
@@ -457,30 +565,41 @@ main {
   background: none;
   border: 0;
   padding: 0.3rem;
-  color: var(--ink);
+  color: var(--fe-ink-muted);
   cursor: pointer;
 }
 
 .drawer-nav {
   list-style: none;
-  margin: 0 0 auto;
+  margin: 0;
   padding: 0;
   display: grid;
   gap: 0.2rem;
 }
 
+/* Nav labels in the display face (Montserrat), brand-ink; a navy-soft hover
+   and a navy active state — navy is the brand's selection colour. */
 .drawer-nav a,
 .drawer-nav .nav-static {
   display: flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.85rem 0;
-  font-size: 1.05rem;
-  border-bottom: 1px solid var(--line);
+  padding: 0.5rem 0.6rem;
+  margin: 0 -0.6rem;
+  border-radius: var(--fe-radius-md);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--fe-ink);
+}
+
+.drawer-nav a:hover {
+  background: var(--fe-brand-soft);
+  color: var(--fe-navy);
 }
 
 .drawer-nav a.active {
-  color: var(--sale);
+  color: var(--fe-navy);
 }
 
 /* Category list under Product, indented and lighter. */
@@ -491,16 +610,20 @@ main {
 }
 
 .drawer-subnav a {
-  padding: 0.55rem 0 0.55rem 1rem;
-  font-size: 0.9rem;
-  color: var(--muted);
-  border-bottom: 1px solid var(--line);
+  padding: 0.5rem 0 0.5rem 1rem;
+  font-size: 0.8rem;
+  color: var(--fe-ink-muted);
+}
+
+.drawer-subnav a:hover {
+  color: var(--fe-navy);
 }
 
 .drawer-actions {
   display: grid;
   gap: 0.2rem;
   padding-top: 1rem;
+  margin-top: 1rem;
 }
 
 .drawer-actions a,
@@ -513,9 +636,14 @@ main {
   padding: 0.7rem 0;
   font: inherit;
   font-size: 0.95rem;
-  color: inherit;
+  color: var(--fe-ink);
   cursor: pointer;
   text-align: left;
+}
+
+.drawer-actions a:hover,
+.drawer-actions button:hover {
+  color: var(--fe-navy);
 }
 
 /* ---------- primary nav ---------- */
@@ -987,6 +1115,94 @@ main {
   color: var(--ink);
 }
 
+/* Hero feature cards: icon + title + description, straddling the bottom edge
+   of the hero. The negative top margin pulls the row up so the cards sit half
+   over the video and half below it (the hero block reserves room via its own
+   bottom padding). */
+.hero-features {
+  position: relative;
+  z-index: 2;
+  max-width: var(--max);
+  margin: -5.5rem auto 3rem;
+  padding: 0 1.5rem;
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+}
+
+/* fusion-edge-brand card: surface-raised, 1px line border, precise 6px corner,
+   borders-over-shadows. Fades up on load, staggered per card. */
+.hero-feature {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.4rem 1.5rem;
+  background: var(--fe-surface-raised);
+  border: 1px solid var(--fe-line);
+  border-radius: var(--fe-radius-md);
+  box-shadow: 0 18px 40px rgba(14, 65, 133, 0.14);
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  animation: fade-up 0.5s ease both;
+}
+
+.hero-feature:hover {
+  border-color: var(--fe-navy);
+}
+
+/* Stagger the three cards so they rise in sequence. */
+.hero-feature:nth-child(1) { animation-delay: 0.05s; }
+.hero-feature:nth-child(2) { animation-delay: 0.15s; }
+.hero-feature:nth-child(3) { animation-delay: 0.25s; }
+
+/* Green-tinted badge, navy glyph — the brand's edge-green spark on structure. */
+.hero-feature-icon {
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: var(--fe-radius-md);
+  background: color-mix(in srgb, var(--fe-edge-green) 16%, transparent);
+  color: var(--fe-navy);
+}
+
+.hero-feature-icon svg {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+
+.hero-feature-body h3 {
+  margin: 0 0 0.3rem;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--fe-ink);
+}
+
+.hero-feature-body p {
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--fe-ink-muted);
+}
+
+/* Stack the cards on narrow screens; less overlap so they don't ride too far
+   up over the hero copy. */
+@media (max-width: 52rem) {
+  .hero-features {
+    grid-template-columns: 1fr;
+    margin-top: -3rem;
+    gap: 0.9rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-feature {
+    animation: none;
+  }
+}
+
 .eyebrow {
   font-size: 0.7rem;
   letter-spacing: 0.18em;
@@ -1079,22 +1295,43 @@ main {
   text-align: left;
 }
 
+/* Product card — fusion-edge-brand .fe-card: a surface-raised card with a 1px
+   line border and the soft "borders over shadows" treatment. The media well
+   carries the brand's faint blueprint grid; the body is left-aligned with a
+   mono maker label over the product name. */
 .tile {
-  background: var(--panel);
-  padding: 1.4rem 1.2rem 1.7rem;
-  display: grid;
-  gap: 0.7rem;
+  background: var(--fe-surface-raised);
+  border: 1px solid var(--fe-line);
+  border-radius: var(--fe-radius-md);
+  box-shadow: var(--fe-shadow-card);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.tile:hover {
+  border-color: var(--fe-navy);
+  box-shadow: 0 8px 24px rgba(14, 65, 133, 0.12);
 }
 
 .tile:hover .art {
-  transform: scale(1.05);
+  transform: scale(1.04);
 }
 
+/* Media well: product sits on brand-soft over a 16px blueprint grid — the
+   "drafting table" the product lands on. */
 .tile-art {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 11rem;
+  /* Square media well so every card's image area is a consistent 1:1. */
+  aspect-ratio: 1 / 1;
+  background-color: var(--fe-brand-soft);
+  background-image:
+    linear-gradient(var(--fe-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--fe-line) 1px, transparent 1px);
+  background-size: 16px 16px;
 }
 
 .tile-art .art {
@@ -1102,18 +1339,49 @@ main {
   transition: transform 0.35s ease;
 }
 
+.tile-body {
+  padding: 0.9rem 1rem 1.1rem;
+  display: grid;
+  gap: 0.25rem;
+}
+
+/* Maker / manufacturer — tracked uppercase mono, the brand "label" style. */
+.tile-maker {
+  font-family: var(--fe-font-mono);
+  font-size: 0.62rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fe-ink-muted);
+}
+
 .tile h3 {
   margin: 0;
-  font-size: 0.85rem;
-  font-weight: 500;
-  text-align: center;
+  /* Card names stay in the body sans, not the display face — more legible on
+     dense product grids (per the brand type rules). */
+  font-family: var(--font);
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: left;
+  color: var(--fe-ink);
+  /* Cap long names at two lines with an ellipsis, and reserve two lines'
+     height so single- and double-line titles leave the price row aligned
+     across the grid. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: calc(2 * 0.95rem * 1.35);
 }
 
 .tile-price {
-  margin: 0;
-  font-size: 0.8rem;
-  color: var(--muted);
-  text-align: center;
+  margin: 0.15rem 0 0;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--fe-ink);
+  text-align: left;
   min-height: 1rem;
 }
 
@@ -1129,32 +1397,38 @@ main {
   padding: 0.2rem;
 }
 
+/* Badges — fusion-edge-brand .fe-badge: tracked uppercase mono, radius-sm. */
 .flag-out,
 .flag-sale {
   position: absolute;
-  font-size: 0.62rem;
-  letter-spacing: 0.08em;
   z-index: 2;
+  font-family: var(--fe-font-mono);
+  font-size: 0.6rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: var(--fe-radius-sm);
 }
 
 .flag-out {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
-  background: #fff;
-  color: var(--ink);
-  padding: 0.5rem 1.1rem;
+  background: var(--fe-surface-raised);
+  color: var(--fe-navy-ink);
+  border: 1px solid var(--fe-line);
+  padding: 0.4rem 0.8rem;
   white-space: nowrap;
 }
 
-/* Kept warm rather than brand green: a green discount badge reads as an
-   availability cue instead of a price cut. */
+/* Warm, not green: green is reserved for availability / Revit-ready, so a
+   discount uses the warning-family accent instead. */
 .flag-sale {
-  top: 0;
-  left: 0;
+  top: 0.6rem;
+  left: 0.6rem;
   background: var(--sale);
   color: #fff;
-  padding: 0.2rem 0.5rem;
+  padding: 0.25rem 0.55rem;
 }
 
 .see-all {
@@ -1339,12 +1613,18 @@ main {
   width: 100%;
   height: 100%;
   object-fit: contain;
-  /* Blend white photo backgrounds into the grey panel — see .gallery-main img. */
-  mix-blend-mode: multiply;
+  /* No multiply: against the blue blueprint well it washed products out and let
+     the grid show through them (looked faded/transparent). Products now render
+     at full strength on a clean white tile; the grid stays visible around it. */
+  background: #fff;
 }
 
 .tile-art img {
-  max-height: 11rem;
+  /* Inset so the product floats on the blueprint grid instead of covering it
+     edge-to-edge (the brand's "product lands on the drafting table" look). */
+  width: 82%;
+  height: 82%;
+  object-fit: contain;
 }
 
 .hero-art img {
@@ -1355,6 +1635,7 @@ main {
 .art-empty {
   display: block;
   width: 100%;
+  height: 100%;
   min-height: 9rem;
 }
 
@@ -1511,9 +1792,17 @@ main {
   min-width: 0;
 }
 
+/* Gallery media well: the brand's blueprint "drafting table" — product on
+   brand-soft over a 16px grid, inside a bordered surface-raised frame. */
 .gallery-main {
   margin: 0;
-  background: var(--panel);
+  background-color: var(--fe-brand-soft);
+  background-image:
+    linear-gradient(var(--fe-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--fe-line) 1px, transparent 1px);
+  background-size: 16px 16px;
+  border: 1px solid var(--fe-line);
+  border-radius: var(--fe-radius-md);
   padding: 1.5rem;
   aspect-ratio: 1 / 1;
   min-width: 0;
@@ -1531,11 +1820,9 @@ main {
      ct-media-container), which carries the data-cim-* attributes, instead of
      stopping at this child <img>. */
   pointer-events: none;
-  /* multiply drops the photo's white background onto the panel colour, so a
-     white-backed product blends into #f2f1ef. White → panel; darker product
-     pixels are largely unchanged. Note: it also darkens light product areas,
-     and only works because .gallery-main's background is the panel. */
-  mix-blend-mode: multiply;
+  /* Full-strength product (no multiply, which faded it against the blue grid).
+     The product floats on the blueprint well directly; object-fit keeps its
+     own background intact. */
 }
 
 .gallery-thumbs {
@@ -1550,8 +1837,9 @@ main {
 .thumb {
   width: 100%;
   aspect-ratio: 1 / 1;
-  background: var(--panel);
-  border: 1px solid transparent;
+  background: var(--fe-brand-soft);
+  border: 1px solid var(--fe-line);
+  border-radius: var(--fe-radius-sm);
   padding: 0.35rem;
   cursor: pointer;
   display: block;
@@ -1566,17 +1854,32 @@ main {
 }
 
 .thumb:hover {
-  border-color: var(--line);
+  border-color: var(--fe-ink-muted);
 }
 
+/* Active thumb takes the brand navy — the selection colour. */
 .thumb.on {
-  border-color: var(--ink);
+  border-color: var(--fe-navy);
+}
+
+/* Maker label above the product name — the brand's tracked mono "label". */
+.detail-maker {
+  display: block;
+  font-family: var(--fe-font-mono);
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--fe-ink-muted);
+  margin-bottom: 0.4rem;
 }
 
 .detail-body h1 {
-  font-size: 1.1rem;
-  font-weight: 600;
-  margin: 0.3rem 0 0.8rem;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1.2;
+  margin: 0 0 0.7rem;
+  color: var(--fe-ink);
 }
 
 
@@ -1810,11 +2113,18 @@ main {
 }
 
 .detail-meta dt {
-  color: var(--muted);
+  color: var(--fe-ink-muted);
 }
 
 .detail-meta dd {
   margin: 0;
+}
+
+/* SKUs are technical identifiers — mono, matching the brand spec style. */
+.detail-meta .mono-value {
+  font-family: var(--fe-font-mono);
+  font-size: 0.78rem;
+  color: var(--fe-ink);
 }
 
 .detail-meta a:hover {
@@ -2005,14 +2315,18 @@ main {
 }
 
 .spec-row dt {
-  color: var(--muted);
+  color: var(--fe-ink-muted);
 }
 
+/* Spec values read as technical data — mono, per the brand spec-table style. */
 .spec-row dd {
   margin: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 0.8rem;
+  font-family: var(--fe-font-mono);
+  font-size: 0.8rem;
+  color: var(--fe-ink);
 }
 
 .spec-value {
@@ -2047,6 +2361,65 @@ main {
 
 .btn-solid.saved {
   background: var(--green);
+}
+
+/* Save / sign-in-to-save control on the product page — fusion-edge-brand
+   button: navy outline at rest, fills on hover; the saved state takes the
+   edge-green (availability); the sign-in variant is a solid navy call. */
+.btn-save {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.4rem;
+  border-radius: var(--fe-radius-md);
+  border: 1.5px solid var(--fe-navy);
+  background: var(--fe-surface-raised);
+  color: var(--fe-navy);
+  font-family: var(--font);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.btn-save:hover:not(:disabled) {
+  background: var(--fe-brand-soft);
+}
+
+.btn-save:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Saved — green border + tint, the brand's availability colour. */
+.btn-save.is-saved {
+  border-color: var(--fe-edge-green);
+  color: var(--fe-edge-green-text, #2f7a16);
+  background: color-mix(in srgb, var(--fe-edge-green) 12%, transparent);
+}
+
+/* Sign-in-to-save: a solid navy call to action. */
+.btn-save-signin {
+  background: var(--fe-navy);
+  border-color: var(--fe-navy);
+  color: #fff;
+}
+
+.btn-save-signin:hover {
+  background: var(--fe-navy-ink);
+  border-color: var(--fe-navy-ink);
+}
+
+.save-signin {
+  display: grid;
+  gap: 0.5rem;
+  justify-items: start;
+}
+
+.save-signin-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--fe-ink-muted);
 }
 
 /* ---------- library ---------- */
@@ -2473,4 +2846,226 @@ main {
     font-size: 0.82rem;
     flex: 0 0 auto;
   }
+}
+
+/* ---------- shop filters ---------- */
+
+.shop-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.4rem;
+}
+
+.filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  border: 1px solid var(--fe-line);
+  background: var(--fe-surface-raised);
+  color: var(--fe-ink);
+  padding: 0.5rem 0.9rem;
+  border-radius: var(--fe-radius-md);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.filter-toggle:hover {
+  border-color: var(--fe-navy);
+  color: var(--fe-navy);
+}
+
+.linkish {
+  background: none;
+  border: 0;
+  color: var(--fe-navy);
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 0;
+}
+
+/* Right-side slide-in panel, reusing .drawer-root/.drawer-backdrop behaviour. */
+.filter-drawer {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(88vw, 22rem);
+  background: var(--fe-surface-raised);
+  border-left: 1px solid var(--fe-line);
+  box-shadow: -2px 0 24px rgba(14, 65, 133, 0.16);
+  padding: 1.2rem 1.4rem;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  transform: translateX(100%);
+  transition: transform 0.28s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.filter-drawer *,
+.filter-drawer *::before,
+.filter-drawer *::after {
+  box-sizing: border-box;
+}
+
+.drawer-root.open .filter-drawer {
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .filter-drawer {
+    transition: none;
+  }
+}
+
+.filter-body {
+  flex: 1;
+  min-width: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.filter-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--fe-ink-muted);
+}
+
+.filter-input {
+  border: 1px solid var(--fe-line);
+  background: none;
+  border-radius: var(--fe-radius-md);
+  padding: 0.5rem 0.7rem;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--fe-ink);
+  width: 100%;
+}
+
+.filter-input:focus {
+  outline: none;
+  border-color: var(--fe-navy);
+}
+
+.price-inputs {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.price-inputs .filter-input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.price-dash {
+  color: var(--fe-ink-muted);
+  flex: 0 0 auto;
+}
+
+.price-range {
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  accent-color: var(--fe-navy);
+}
+
+.price-readout {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--fe-ink-muted);
+}
+
+.filter-fills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  max-height: 13rem;
+  overflow-y: auto;
+}
+
+.fill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  border: 1px solid var(--fe-line);
+  background: none;
+  color: var(--fe-ink);
+  padding: 0.4rem 0.75rem;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.82rem;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.fill:hover {
+  border-color: var(--fe-navy);
+}
+
+.fill.on {
+  border-color: var(--fe-navy);
+  background: var(--fe-navy);
+  color: #fff;
+}
+
+.fill.on .swatch-dot {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+.swatch-dot {
+  width: 0.85rem;
+  height: 0.85rem;
+  border-radius: 50%;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  flex: 0 0 auto;
+}
+
+.filter-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding-top: 1rem;
+  margin-top: 1rem;
+  border-top: 1px solid var(--fe-line);
+}
+
+.filter-apply {
+  white-space: nowrap;
+}
+
+.filter-apply {
+  border: 0;
+  background: var(--fe-navy);
+  color: #fff;
+  padding: 0.6rem 1.1rem;
+  border-radius: var(--fe-radius-md);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.filter-apply:hover {
+  background: var(--fe-navy-ink);
+}
+
+.filter-root {
+  z-index: 80;
 }

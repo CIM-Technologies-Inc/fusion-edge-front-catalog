@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { getProducts, getCategories, getBrands } from '../lib/queries'
+import { getProducts, getCategories, getBrands, getCatalogStats } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import ProductCard from '../components/ProductCard'
 import { SkeletonTiles, SkeletonCategoryTiles } from '../components/Skeleton'
@@ -60,6 +60,72 @@ function BrandMarquee() {
         ))}
       </div>
     </section>
+  )
+}
+
+// Feature cards that straddle the bottom edge of the hero — icon, title and a
+// short description, half over the image and half below it. The descriptions
+// weave in live catalog counts from Supabase, falling back to neutral copy
+// before the counts load (or if a count fails).
+function HeroFeatures() {
+  const { data: stats } = useAsync(() => getCatalogStats(), [])
+
+  const items = [
+    {
+      // Grid of tiles — "browse the catalogue".
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <rect x="3" y="3" width="7" height="7" rx="1.5" />
+          <rect x="14" y="3" width="7" height="7" rx="1.5" />
+          <rect x="3" y="14" width="7" height="7" rx="1.5" />
+          <rect x="14" y="14" width="7" height="7" rx="1.5" />
+        </svg>
+      ),
+      title: 'Browse the catalog',
+      text:
+        stats?.products != null
+          ? `${stats.products}+ products across ${stats.categories ?? 'every'} material categories.`
+          : 'Paint, tile, flooring and more — all in one place.',
+    },
+    {
+      // Ribbon/award — "trusted brands".
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="12" cy="9" r="6" />
+          <path d="M8.5 13.5 7 22l5-3 5 3-1.5-8.5" />
+        </svg>
+      ),
+      title: 'Trusted brands',
+      text:
+        stats?.brands != null
+          ? `${stats.brands}+ brands you already specify, in one library.`
+          : 'The brands you already specify, in one library.',
+    },
+    {
+      // Cube dropping in — "drag into Revit".
+      icon: (
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M21 7.5 12 2 3 7.5v9L12 22l9-5.5v-9Z" />
+          <path d="M3 7.5 12 13l9-5.5M12 13v9" />
+        </svg>
+      ),
+      title: 'Drag into Revit',
+      text: 'Drop products straight into your model with specs attached.',
+    },
+  ]
+
+  return (
+    <ul className="hero-features" aria-label="Why Fusion Edge">
+      {items.map((it) => (
+        <li className="hero-feature" key={it.title}>
+          <span className="hero-feature-icon" aria-hidden="true">{it.icon}</span>
+          <div className="hero-feature-body">
+            <h3>{it.title}</h3>
+            <p>{it.text}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -160,6 +226,7 @@ export default function Home() {
         <VideoBand />
         {/* <BrandMarquee /> */}
       </div>
+      <HeroFeatures />
       <CategoryTiles />
       <Trending products={products} loading={loading} error={error} />
       <SearchBar />

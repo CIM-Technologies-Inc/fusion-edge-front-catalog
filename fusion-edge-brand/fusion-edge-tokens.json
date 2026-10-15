@@ -1,0 +1,81 @@
+{
+  "name": "Fusion Edge",
+  "version": 1,
+  "color": {
+    "themes": [
+      { "id": "light", "name": "Light" },
+      { "id": "dark", "name": "Dark" }
+    ],
+    "tokens": [
+      { "name": "surface", "value": { "light": "#f6f8fb", "dark": "#0b1424" }, "usage": "Page background — a cool drafting-paper white, never pure white." },
+      { "name": "surface-raised", "value": { "light": "#ffffff", "dark": "#121e33" }, "usage": "Product cards, drawers, menus, the spec table." },
+      { "name": "line", "value": { "light": "#dce3ed", "dark": "#24324a" }, "usage": "Hairlines, card borders, table rules, the blueprint grid." },
+      { "name": "line-strong", "value": { "light": "#7a8ba3", "dark": "#5d6f8a" }, "usage": "Input and control borders (3:1 on both surfaces)." },
+      { "name": "ink", "value": { "light": "#0b1b33", "dark": "#e8eef7" }, "usage": "Primary text on surface and surface-raised." },
+      { "name": "ink-muted", "value": { "light": "#5a6b82", "dark": "#9aabc2" }, "usage": "Secondary text: manufacturer, dimensions, metadata." },
+      { "name": "fusion-navy", "value": { "light": "#0e4185", "dark": "#7ba7f0" }, "usage": "THE brand colour — the 'FUSION' in the logo. Primary buttons, links, active nav, selected states. As text on surface or brand-soft." },
+      { "name": "navy-deep", "value": { "light": "#0a2a57", "dark": "#1e3f73" }, "usage": "Dark brand fields: header bar, footer, hero bands. Text on it is on-brand (light theme) or ink (dark theme)." },
+      { "name": "brand-soft", "value": { "light": "#e6eef9", "dark": "#13284a" }, "usage": "Tinted backgrounds behind fusion-navy text; product image wells; hover rows." },
+      { "name": "on-brand", "value": { "light": "#ffffff", "dark": "#0b1424" }, "usage": "Text and icons on a fusion-navy fill (primary button label)." },
+      { "name": "edge-green", "value": "#74cc44", "usage": "Signature accent — the 'EDGE' in the logo. Fills only: the Drag-to-Revit handle, drop-success, 'Revit-ready' marks. Never as text on light grounds (2:1); text on it is navy-ink." },
+      { "name": "navy-ink", "value": "#0a2a57", "usage": "Text and icons placed ON edge-green, in both themes (7:1)." },
+      { "name": "edge-green-text", "value": { "light": "#2f7a16", "dark": "#8ee05c" }, "usage": "Green as text: 'In stock', 'Loaded into Revit', success messages, on surface or green-soft." },
+      { "name": "green-soft", "value": { "light": "#eaf7e1", "dark": "#16301a" }, "usage": "Tinted background behind edge-green-text; the drop zone's success state." },
+      { "name": "warning", "value": { "light": "#9a4a06", "dark": "#f5b041" }, "usage": "Version mismatch (e.g. family saved in a newer Revit). As text on surface or warning-soft." },
+      { "name": "warning-soft", "value": { "light": "#fdf0dd", "dark": "#3a2709" }, "usage": "Background behind warning text." },
+      { "name": "danger", "value": { "light": "#b4302a", "dark": "#ff7a6e" }, "usage": "Errors and failed transfers. As text on surface or danger-soft." },
+      { "name": "danger-soft", "value": { "light": "#fbe7e5", "dark": "#3d1513" }, "usage": "Background behind danger text." },
+      { "name": "focus", "value": "{fusion-navy}", "usage": "Focus rings (2px, 2px offset) — alias of fusion-navy." },
+      { "name": "link", "value": "{fusion-navy}", "usage": "Inline links — alias of fusion-navy." }
+    ]
+  },
+  "type": {
+    "fonts": [],
+    "families": {
+      "display": "Montserrat, \"Segoe UI\", system-ui, sans-serif",
+      "sans": "\"IBM Plex Sans\", \"Segoe UI\", system-ui, sans-serif",
+      "mono": "\"IBM Plex Mono\", ui-monospace, Menlo, monospace"
+    },
+    "groups": [
+      { "name": "Display", "family": "display", "styles": [
+        { "name": "display-xl", "fontSize": "56px", "lineHeight": "60px", "fontWeight": 700, "letterSpacing": "-0.02em", "sample": "Drag. Drop. Build.", "usage": "Home hero only." },
+        { "name": "display-l", "fontSize": "40px", "lineHeight": "44px", "fontWeight": 700, "letterSpacing": "-0.015em", "sample": "Lighting fixtures", "usage": "Category and campaign headers." },
+        { "name": "heading", "fontSize": "24px", "lineHeight": "32px", "fontWeight": 600, "sample": "Revit-ready families", "usage": "Section headings, product page title." }
+      ]},
+      { "name": "Text", "family": "sans", "styles": [
+        { "name": "title", "fontSize": "17px", "lineHeight": "24px", "fontWeight": 600, "sample": "Pendant Light — Linear 1200", "usage": "Product names on cards." },
+        { "name": "body", "fontSize": "15px", "lineHeight": "24px", "fontWeight": 400, "sample": "Parametric family with editable length, finish and lamp type.", "usage": "Default running text." },
+        { "name": "small", "fontSize": "13px", "lineHeight": "20px", "fontWeight": 400, "sample": "Ships with 3 type variations", "usage": "Metadata, helper text." }
+      ]},
+      { "name": "Technical", "family": "mono", "styles": [
+        { "name": "label", "fontSize": "12px", "lineHeight": "16px", "fontWeight": 500, "letterSpacing": "0.14em", "sample": "KNOWLEDGE FLOWS", "usage": "Uppercase eyebrows and badges — echoes the logo's tracked tagline." },
+        { "name": "spec", "fontSize": "13px", "lineHeight": "20px", "fontWeight": 400, "sample": "W 1200 × D 80 × H 60 mm", "usage": "Dimensions, SKUs, parameter values, file names (.rfa)." }
+      ]}
+    ]
+  },
+  "spacing": {
+    "tokens": [
+      { "name": "space-1", "value": "4px", "usage": "Icon-to-label gap." },
+      { "name": "space-2", "value": "8px", "usage": "Badge padding, tight stacks." },
+      { "name": "space-3", "value": "12px", "usage": "Control padding, list gaps." },
+      { "name": "space-4", "value": "16px", "usage": "Card padding; the blueprint grid pitch." },
+      { "name": "space-6", "value": "24px", "usage": "Grid gutters between product cards." },
+      { "name": "space-8", "value": "32px", "usage": "Section padding inside panels." },
+      { "name": "space-12", "value": "48px", "usage": "Gaps between page sections." },
+      { "name": "space-16", "value": "64px", "usage": "Hero padding." }
+    ]
+  },
+  "radius": {
+    "tokens": [
+      { "name": "radius-sm", "value": "3px", "usage": "Badges, inputs, checkboxes." },
+      { "name": "radius-md", "value": "6px", "usage": "Buttons, cards, drop zone — precise, not soft." },
+      { "name": "radius-lg", "value": "10px", "usage": "Drawers, modals, image wells." }
+    ]
+  },
+  "shadow": {
+    "tokens": [
+      { "name": "shadow-card", "value": { "light": "0 1px 2px rgba(11,27,51,0.06)", "dark": "0 1px 2px rgba(0,0,0,0.4)" }, "usage": "Resting product card (borders do most of the work)." },
+      { "name": "shadow-lift", "value": { "light": "0 12px 28px rgba(14,65,133,0.22)", "dark": "0 12px 28px rgba(0,0,0,0.6)" }, "usage": "A card being dragged toward Revit — the only big shadow in the system." }
+    ]
+  }
+}

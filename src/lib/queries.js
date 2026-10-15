@@ -27,16 +27,51 @@ export async function getBrands() {
   )
 }
 
-// Listing shape: enough to render a tile. Variations aren't fetched here —
-// the price range on the product row is maintained by a trigger, so listings
-// never need to join them.
+// Headline counts for the hero stat bar. Uses head+exact count so no rows are
+// transferred — just the totals. Each count is independent; a failing one
+// resolves to null so the bar can hide that single stat rather than erroring.
+export async function getCatalogStats() {
+  const count = async (table, apply = (q) => q) => {
+    const { count, error } = await apply(
+      supabase.from(table).select('*', { count: 'exact', head: true })
+    )
+    return error ? null : count
+  }
+
+  const [products, categories, brands] = await Promise.all([
+    count('products', (q) => q.eq('published', true)),
+    count('categories'),
+    count('brands'),
+  ])
+  return { products, categories, brands }
+}
+
+// Listing shape: enough to render a tile. The price range on the product row
+// is maintained by a trigger, so listings don't join variations for price —
+// but stock is per-variation, so we pull just the variations' in_stock flags
+// (nothing else) to know whether a variable product has any available option.
+// product_attributes → term ids let us filter by attribute values client-side.
 const LIST_FIELDS = `
   id, name, slug, kind, price_cents, sale_price_cents, price_max_cents,
   in_stock, featured,
-  images:product_images(url, alt, position, variation_id)
+  brand:brands(name),
+  images:product_images(url, alt, position, variation_id),
+  variations(in_stock),
+  product_attributes(product_attribute_terms(term_id))
 `
 
-export async function getProducts({ categoryId, search, featured, limit = 24 } = {}) {
+export async function getProducts({
+  categoryId,
+  search,
+  featured,
+  minPrice,
+  maxPrice,
+  // term ids grouped per attribute: { attributeId: [termId, …] }. A product
+  // must match at least one term in EACH chosen attribute (AND across
+  // attributes, OR within). Empty/omitted means no attribute filtering.
+  attributeTerms,
+  limit = 24,
+} = {}) {
   let q = supabase
     .from('products')
     .select(LIST_FIELDS)
@@ -48,7 +83,81 @@ export async function getProducts({ categoryId, search, featured, limit = 24 } =
   if (featured) q = q.eq('featured', true)
   if (search) q = q.ilike('name', `%${search}%`)
 
-  return (unwrap(await q) ?? []).map(normalizeImages)
+  let rows = (unwrap(await q) ?? []).map(normalizeImages)
+
+  // Price range (in cents) — filter on the price actually shown on the card:
+  // its sale price when present, else its base price.
+  const min = Number.isFinite(minPrice) ? minPrice : null
+  const max = Number.isFinite(maxPrice) ? maxPrice : null
+  if (min != null || max != null) {
+    rows = rows.filter((p) => {
+      const c = effectivePrice(p)
+      if (c == null) return false
+      if (min != null && c < min) return false
+      if (max != null && c > max) return false
+      return true
+    })
+  }
+
+  // Attribute filters — each product carries a flat set of its term ids.
+  const groups = Object.values(attributeTerms ?? {}).filter(
+    (ids) => Array.isArray(ids) && ids.length > 0
+  )
+  if (groups.length > 0) {
+    rows = rows.filter((p) => {
+      const owned = new Set(
+        (p.product_attributes ?? []).flatMap((pa) =>
+          (pa.product_attribute_terms ?? []).map((t) => t.term_id)
+        )
+      )
+      return groups.every((ids) => ids.some((id) => owned.has(id)))
+    })
+  }
+
+  return rows
+}
+
+// Attributes flagged as storefront filters (admin sets `filterable`), with
+// their available values — used to build the filter sidebar.
+//
+// Only GLOBAL (shared) values are offered, matching the admin Attributes page.
+// Product-owned values (private to one product) are deliberately excluded so
+// the filter stays a clean, curated list rather than every one-off value.
+export async function getFilterAttributes() {
+  const rows = unwrap(
+    await supabase
+      .from('attributes')
+      .select(
+        'id, name, slug, display_type, position, filterable, terms:attribute_terms(id, name, swatch, position, product_id)'
+      )
+      .eq('filterable', true)
+      .is('attribute_terms.product_id', null)
+      .order('position')
+  )
+  return (rows ?? [])
+    .map((a) => ({
+      ...a,
+      terms: (a.terms ?? [])
+        .filter((t) => t.product_id == null)
+        .sort((x, y) => x.position - y.position),
+    }))
+    .filter((a) => a.terms.length > 0)
+}
+
+// Lowest and highest shown price (in cents) across published products, for the
+// price-range slider's bounds. Falls back to a sane default if empty.
+export async function getPriceBounds() {
+  const rows = unwrap(
+    await supabase
+      .from('products')
+      .select('price_cents, sale_price_cents')
+      .eq('published', true)
+  )
+  const prices = (rows ?? [])
+    .map((r) => r.sale_price_cents ?? r.price_cents)
+    .filter((c) => c != null)
+  if (!prices.length) return { min: 0, max: 0 }
+  return { min: Math.min(...prices), max: Math.max(...prices) }
 }
 
 // Full product: attributes with their available terms, every variation with
@@ -98,10 +207,17 @@ function groupMeta(rows) {
 }
 
 // Postgrest returns nested rows in insertion order; sort and flatten here so
-// components don't each re-implement it.
+// components don't each re-implement it. Also derive `available`: for a
+// variable product, that's "any variation in stock"; for a simple product,
+// its own in_stock flag. Cards read this instead of the bare parent flag,
+// which on a variable product doesn't reflect its variations' stock.
 function normalizeImages(p) {
   const images = (p.images ?? []).sort((a, b) => a.position - b.position)
-  return { ...p, images }
+  const available =
+    p.kind === 'variable'
+      ? (p.variations ?? []).some((v) => v.in_stock)
+      : !!p.in_stock
+  return { ...p, images, available }
 }
 
 function normalizeProduct(p) {
