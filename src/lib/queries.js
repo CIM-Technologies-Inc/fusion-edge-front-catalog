@@ -70,20 +70,34 @@ export async function getProducts({
   // must match at least one term in EACH chosen attribute (AND across
   // attributes, OR within). Empty/omitted means no attribute filtering.
   attributeTerms,
+  // 'newest' (default) or 'views' — the home "Most Viewed" section passes
+  // 'views' to rank by all-time product-page views.
+  orderBy = 'newest',
   limit = 24,
 } = {}) {
-  let q = supabase
-    .from('products')
-    .select(LIST_FIELDS)
-    .eq('published', true)
-    .order('created_at', { ascending: false })
-    .limit(limit)
+  // Build the base query; `byViews` adds the view_count ordering. Kept as a
+  // factory so we can retry ordered by newest if view_count isn't there yet
+  // (the 0003 migration hasn't been run) — the feature degrades, nothing breaks.
+  const build = (byViews) => {
+    let q = supabase
+      .from('products')
+      .select(LIST_FIELDS)
+      .eq('published', true)
+      .limit(limit)
+    q = byViews
+      ? q.order('view_count', { ascending: false }).order('created_at', { ascending: false })
+      : q.order('created_at', { ascending: false })
+    if (categoryId) q = q.eq('category_id', categoryId)
+    if (featured) q = q.eq('featured', true)
+    if (search) q = q.ilike('name', `%${search}%`)
+    return q
+  }
 
-  if (categoryId) q = q.eq('category_id', categoryId)
-  if (featured) q = q.eq('featured', true)
-  if (search) q = q.ilike('name', `%${search}%`)
+  let res = await build(orderBy === 'views')
+  // Fallback: a missing view_count column (migration not applied) → newest.
+  if (res.error && orderBy === 'views') res = await build(false)
 
-  let rows = (unwrap(await q) ?? []).map(normalizeImages)
+  let rows = (unwrap(res) ?? []).map(normalizeImages)
 
   // Price range (in cents) — filter on the price actually shown on the card:
   // its sale price when present, else its base price.
@@ -158,6 +172,18 @@ export async function getPriceBounds() {
     .filter((c) => c != null)
   if (!prices.length) return { min: 0, max: 0 }
   return { min: Math.min(...prices), max: Math.max(...prices) }
+}
+
+// Record a product-page view. Calls the secure SQL function (anon can't UPDATE
+// products directly). Fire-and-forget: a failed view count must never break the
+// page, so errors are swallowed.
+export async function incrementProductView(productId) {
+  if (!productId) return
+  try {
+    await supabase.rpc('increment_product_view', { p_id: productId })
+  } catch {
+    // ignore — view tracking is best-effort
+  }
 }
 
 // Full product: attributes with their available terms, every variation with

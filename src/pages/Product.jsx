@@ -3,6 +3,7 @@ import { Link, useParams } from 'react-router-dom'
 import {
   getProductBySlug,
   getRelatedProducts,
+  incrementProductView,
   findVariation,
   imagesFor,
   effectivePrice,
@@ -617,6 +618,12 @@ export default function Product() {
     // Intentionally keyed on product id alone: re-run only when a different
     // product loads, so the shopper's own picks aren't reset on re-render.
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id])
+
+  // Count an all-time view once per product load (feeds the home "Most Viewed"
+  // section). Best-effort: the helper swallows errors so it never blocks render.
+  useEffect(() => {
+    if (product?.id) incrementProductView(product.id)
   }, [product?.id])
 
   // CIM/Revit bridge: the WebView2 shim's wcAutoWire() only finds

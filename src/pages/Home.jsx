@@ -161,8 +161,8 @@ function Trending({ products, loading, error }) {
     <section className="trending">
       <h2>Trending Products</h2>
       <p className="sub">
-        Find a bright ideal to suit your taste with our great selection of
-        suspension, wall, floor and table lights.
+        The most-viewed products in our catalog — what architects and
+        specifiers are looking at right now.
       </p>
 
       {loading && <SkeletonTiles count={4} />}
@@ -217,7 +217,10 @@ function SearchBar() {
 }
 
 export default function Home() {
-  const { data, loading, error } = useAsync(() => getProducts({ limit: 12 }), [])
+  const { data, loading, error } = useAsync(
+    () => getProducts({ orderBy: 'views', limit: 8 }),
+    []
+  )
   const products = data ?? []
 
   return (
