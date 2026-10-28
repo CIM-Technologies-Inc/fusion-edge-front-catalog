@@ -58,6 +58,21 @@ export default function SignIn() {
     )
     if (error) return setStatus({ error: error.message })
 
+    // Supabase doesn't error when the email is already registered (it avoids
+    // leaking which emails exist). On a project with email confirmation ON, a
+    // duplicate comes back with NO session and an EMPTY identities array, while
+    // a genuinely new signup has one identity. Treat the empty case as "taken"
+    // so we don't send a misleading "check your email" message.
+    const alreadyRegistered =
+      !data?.session && (data?.user?.identities?.length ?? 0) === 0
+    if (alreadyRegistered) {
+      setStatus({
+        error:
+          'An account with this email already exists. Try signing in instead.',
+      })
+      return
+    }
+
     if (data?.session) {
       const { error: subErr } = await simulateSubscribe(plan)
       if (subErr) return setStatus({ error: subErr.message })
