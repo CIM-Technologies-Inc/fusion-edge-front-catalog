@@ -65,6 +65,26 @@ export function signOut() {
   return supabase.auth.signOut()
 }
 
+// Hands the current Supabase session to the CIM Revit plugin, but ONLY when the
+// site is running inside the plugin's WebView2 panel. window.chrome.webview
+// exists only there; in a normal browser it's undefined, so this is a no-op on
+// the web and needs no environment gating. Lets the plugin auto sign-in when a
+// user signs in on the storefront inside the docked panel.
+export function postSessionToCimPlugin(session) {
+  try {
+    const bridge = window.chrome && window.chrome.webview
+    if (!bridge || !session) return
+    bridge.postMessage(
+      JSON.stringify({
+        type: 'cim-auth',
+        access_token: session.access_token,
+        refresh_token: session.refresh_token,
+        expires_at: session.expires_at,
+      })
+    )
+  } catch { /* ignore — not in the plugin panel, or bridge unavailable */ }
+}
+
 // SIMULATION ONLY — activate a plan for the signed-in user with no payment,
 // via the simulate_subscribe() RPC. Requires an active session (auth.uid()).
 // Mirrors signup_sim.html; must be removed when real checkout (PayMongo) ships.

@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react'
 import { supabase, isConfigured } from './supabase'
-import { AuthContext, isCustomerAccount } from './auth'
+import {
+  AuthContext,
+  isCustomerAccount,
+  postSessionToCimPlugin,
+} from './auth'
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null)
@@ -26,9 +30,13 @@ export function AuthProvider({ children }) {
       return null
     }
 
+    // Only hand the session to the Revit plugin once it's confirmed a customer
+    // session (accept() signs out staff/admin), so staff tokens never leak into
+    // the panel. No-op outside the plugin's WebView2 panel.
     supabase.auth.getSession().then(async ({ data }) => {
       const u = await accept(data.session?.user ?? null)
       if (!active) return
+      if (u) postSessionToCimPlugin(data.session)
       setUser(u)
       setLoading(false)
     })
@@ -36,7 +44,9 @@ export function AuthProvider({ children }) {
     const { data: sub } = supabase.auth.onAuthStateChange(
       async (_event, session) => {
         const u = await accept(session?.user ?? null)
-        if (active) setUser(u)
+        if (!active) return
+        if (u) postSessionToCimPlugin(session)
+        setUser(u)
       }
     )
     return () => {
