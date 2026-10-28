@@ -2422,6 +2422,103 @@ main {
   color: var(--fe-ink-muted);
 }
 
+/* The two product actions as a row: Download is the primary (solid navy),
+   Save is the secondary (outline). They wrap on narrow widths. */
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin: 0.4rem 0;
+}
+
+.detail-actions > *,
+.detail-actions .save-signin {
+  margin: 0;
+}
+
+/* Let each action share the row evenly and keep a comfortable min size. */
+.detail-actions .btn-save,
+.detail-actions .btn-save-signin {
+  flex: 1 1 auto;
+  min-width: 11rem;
+  justify-content: center;
+}
+
+/* Download = primary: solid navy with a subtle lift on hover. */
+.btn-download {
+  background: var(--fe-navy);
+  border-color: var(--fe-navy);
+  color: #fff;
+  box-shadow: 0 2px 8px rgba(14, 65, 133, 0.22);
+}
+
+.btn-download:hover:not(:disabled) {
+  background: var(--fe-navy-ink);
+  border-color: var(--fe-navy-ink);
+  /* Override the outline-button's brand-soft hover. */
+  color: #fff;
+}
+
+.btn-download svg {
+  flex: 0 0 auto;
+}
+
+/* Confirm-download side drawer: reuses .filter-drawer's slide-in shell. The
+   markup is portaled to <body>, so the standard absolute-in-fixed-root
+   positioning works (no transformed ancestor to trap it). */
+.download-drawer {
+  width: min(88vw, 20rem);
+}
+
+.download-summary {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0;
+}
+
+.download-summary h3 {
+  margin: 0.25rem 0 1rem;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--fe-ink);
+}
+
+.download-meta {
+  margin: 0;
+  display: grid;
+  gap: 0.6rem;
+}
+
+.download-meta > div {
+  display: grid;
+  gap: 0.15rem;
+}
+
+.download-meta dt {
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--fe-ink-muted);
+}
+
+.download-meta dd {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--fe-ink);
+  word-break: break-word;
+}
+
+.download-note {
+  margin: 1.1rem 0 0;
+  padding: 0.7rem 0.85rem;
+  border-radius: var(--fe-radius-md);
+  background: var(--fe-brand-soft);
+  font-size: 0.8rem;
+  line-height: 1.5;
+  color: var(--fe-ink-muted);
+}
+
 /* ---------- library ---------- */
 
 .library {
@@ -2645,44 +2742,211 @@ main {
   color: #1e8449;
 }
 
+/* Auth card — branded register/sign-in form, matching signup_sim.html. */
+.auth-wrap {
+  min-height: calc(100vh - 76px);
+  display: grid;
+  place-items: center;
+  padding: 2.5rem 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 32.5rem;
+  background: var(--fe-surface-raised, #fff);
+  border: 1px solid var(--fe-line, var(--line));
+  border-radius: var(--fe-radius-md, 6px);
+  padding: 1.75rem;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+
+.auth-brand .auth-dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: var(--fe-radius-sm, 3px);
+  background: var(--fe-edge-green, #74cc44);
+}
+
+.auth-brand strong {
+  font-family: var(--font-display, inherit);
+  font-size: 1.05rem;
+  letter-spacing: 0.02em;
+}
+
+.auth-card h1 {
+  font-size: 1.4rem;
+  margin: 0 0 0.25rem;
+}
+
+.auth-lede {
+  color: var(--fe-ink-muted, var(--muted, #5a6b82));
+  margin: 0 0 1.4rem;
+  font-size: 0.92rem;
+}
+
 .form {
   display: grid;
-  gap: 0.8rem;
-  max-width: 22rem;
-  margin: 3rem auto;
-  padding: 0 1.5rem;
+  gap: 1rem;
 }
 
 .form label {
   display: grid;
-  gap: 0.3rem;
-  font-size: 0.85rem;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fe-ink-muted, var(--muted, #5a6b82));
 }
 
 .form input {
-  border: 1px solid var(--line);
-  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--fe-line, var(--line));
+  border-radius: var(--fe-radius-md, 6px);
+  padding: 0.7rem 0.75rem;
   font: inherit;
+  font-size: 0.95rem;
+  text-transform: none;
+  letter-spacing: normal;
+  color: var(--fe-ink, var(--ink));
+  background: #fff;
+}
+
+.form input:focus {
+  outline: none;
+  border-color: var(--fe-navy, #0e4185);
+  box-shadow: 0 0 0 3px var(--fe-brand-soft, #e6eef9);
 }
 
 .form button[type='submit'] {
-  background: var(--ink);
+  background: var(--fe-navy, var(--ink));
   color: #fff;
   border: 0;
-  padding: 0.8rem;
+  border-radius: var(--fe-radius-md, 6px);
+  padding: 0.85rem;
   font: inherit;
   font-weight: 600;
   cursor: pointer;
+  margin-top: 0.1rem;
+}
+
+.form button[type='submit']:hover {
+  background: #0b3569;
+}
+
+.form button[type='submit']:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+/* Plan picker (simulation) — selectable button cards, no radios. */
+.auth-plans {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.auth-plans-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--fe-ink-muted, var(--muted, #5a6b82));
+}
+
+.auth-plan-grid {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.auth-plan {
+  position: relative;
+  display: block;
+  text-align: left;
+  padding: 0.85rem 2.6rem 0.85rem 0.95rem;
+  border: 1px solid var(--fe-line, var(--line));
+  border-radius: var(--fe-radius-md, 6px);
+  background: #fff;
+  font: inherit;
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: normal;
+  transition: border-color 0.14s, background 0.14s, box-shadow 0.14s;
+}
+
+.auth-plan:hover {
+  border-color: #c3d2e8;
+}
+
+.auth-plan:focus-visible {
+  outline: none;
+  border-color: var(--fe-navy, #0e4185);
+  box-shadow: 0 0 0 3px var(--fe-brand-soft, #e6eef9);
+}
+
+.auth-plan.on {
+  border-color: var(--fe-navy, #0e4185);
+  background: var(--fe-brand-soft, #e6eef9);
+  box-shadow: inset 3px 0 0 0 var(--fe-navy, #0e4185);
+}
+
+.auth-plan-name {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--fe-ink, var(--ink));
+}
+
+.auth-plan-access {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--fe-ink-muted, var(--muted, #5a6b82));
+  margin-top: 0.15rem;
+}
+
+/* Checkmark badge — empty ring by default, filled navy when selected. */
+.auth-plan-check {
+  position: absolute;
+  top: 50%;
+  right: 0.9rem;
+  transform: translateY(-50%);
+  width: 1.3rem;
+  height: 1.3rem;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--fe-line, var(--line));
+  border-radius: 999px;
+  color: transparent;
+  background: #fff;
+  transition: background 0.14s, border-color 0.14s, color 0.14s;
+}
+
+.auth-plan.on .auth-plan-check {
+  background: var(--fe-navy, #0e4185);
+  border-color: var(--fe-navy, #0e4185);
+  color: #fff;
+}
+
+.auth-alt {
+  margin-top: 1.1rem;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--fe-ink-muted, var(--muted, #5a6b82));
 }
 
 .linklike {
   background: none;
   border: 0;
   padding: 0;
-  color: inherit;
+  color: var(--fe-navy, inherit);
   cursor: pointer;
   text-decoration: underline;
   font: inherit;
+  font-weight: 600;
 }
 
 .detail,
@@ -2922,6 +3186,9 @@ main {
   }
 }
 
+/* The whole filter panel scrolls, with a slim on-brand scrollbar — a thin
+   navy-tinted thumb on a transparent track (chip groups themselves no longer
+   scroll, so this is the only scroll inside the drawer). */
 .filter-body {
   flex: 1;
   min-width: 0;
@@ -2930,6 +3197,26 @@ main {
   display: flex;
   flex-direction: column;
   gap: 1.4rem;
+  padding-right: 0.4rem;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: color-mix(in srgb, var(--fe-navy) 40%, transparent) transparent;
+}
+
+.filter-body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.filter-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.filter-body::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--fe-navy) 35%, transparent);
+  border-radius: 999px;
+}
+
+.filter-body:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--fe-navy) 55%, transparent);
 }
 
 .filter-group {
@@ -2991,12 +3278,12 @@ main {
   color: var(--fe-ink-muted);
 }
 
+/* Chip groups expand fully — no inner cap or scroll. The whole filter body
+   scrolls instead (see .filter-body). */
 .filter-fills {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  max-height: 13rem;
-  overflow-y: auto;
 }
 
 .fill {

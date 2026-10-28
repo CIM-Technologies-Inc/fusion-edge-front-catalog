@@ -35,6 +35,16 @@ export default function Shop() {
     }
   }, [bounds]) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Lock page scroll while the filter drawer is open, so the window's own
+  // scrollbar doesn't sit alongside the panel — only the panel scrolls.
+  useEffect(() => {
+    if (!open) return
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [open])
+
   const minC = minPrice === '' ? undefined : Number(minPrice)
   const maxC = maxPrice === '' ? undefined : Number(maxPrice)
 

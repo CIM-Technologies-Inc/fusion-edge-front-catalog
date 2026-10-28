@@ -1,0 +1,310 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>FusionEdge — Create account (simulation)</title>
+  <style>
+    :root {
+      --navy: #0e4185;
+      --green: #74cc44;
+      --ink: #0b1b33;
+      --muted: #5a6b82;
+      --line: #dce3ed;
+      --soft: #e6eef9;
+      --bg: #f4f7fb;
+      --radius: 6px;
+      --font: "IBM Plex Sans", system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      color: var(--ink);
+      background: var(--bg);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    .wrap {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 32px 16px;
+    }
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 28px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .brand .dot {
+      width: 12px; height: 12px; border-radius: 3px;
+      background: var(--green);
+    }
+    .brand strong {
+      font-size: 1.05rem;
+      letter-spacing: 0.02em;
+    }
+    h1 {
+      font-size: 1.4rem;
+      margin: 0 0 4px;
+    }
+    .lede {
+      color: var(--muted);
+      margin: 0 0 22px;
+      font-size: 0.92rem;
+    }
+    label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+    .field { margin-bottom: 16px; }
+    input[type=email], input[type=password] {
+      width: 100%;
+      padding: 11px 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      color: var(--ink);
+    }
+    input:focus {
+      outline: none;
+      border-color: var(--navy);
+      box-shadow: 0 0 0 3px var(--soft);
+    }
+    fieldset {
+      border: none;
+      padding: 0;
+      margin: 0 0 20px;
+    }
+    .plans {
+      display: grid;
+      gap: 10px;
+    }
+    .plan {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 12px 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      cursor: pointer;
+      transition: border-color 0.12s, background 0.12s;
+    }
+    .plan:hover { border-color: #c3d2e8; }
+    .plan input { margin-top: 3px; accent-color: var(--navy); }
+    .plan:has(input:checked) {
+      border-color: var(--navy);
+      background: var(--soft);
+    }
+    .plan .name { font-weight: 600; }
+    .plan .access {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+    button.submit {
+      width: 100%;
+      padding: 13px;
+      font-size: 0.98rem;
+      font-weight: 600;
+      font-family: inherit;
+      color: #fff;
+      background: var(--navy);
+      border: none;
+      border-radius: var(--radius);
+      cursor: pointer;
+    }
+    button.submit:hover { background: #0b3569; }
+    button.submit:disabled { opacity: 0.6; cursor: default; }
+    .msg {
+      margin-top: 16px;
+      padding: 12px 14px;
+      border-radius: var(--radius);
+      font-size: 0.9rem;
+      display: none;
+    }
+    .msg.show { display: block; }
+    .msg.ok  { background: #ecf8e6; border: 1px solid #bfe6a7; color: #2c5c15; }
+    .msg.err { background: #fdecec; border: 1px solid #f3b7b7; color: #8a1f1f; }
+    .msg.info{ background: var(--soft); border: 1px solid #c3d2e8; color: var(--navy); }
+    .foot {
+      margin-top: 18px;
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-align: center;
+    }
+    .sim-tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #8a6d1f;
+      background: #fcf3d6;
+      border: 1px solid #ecd99a;
+      border-radius: 3px;
+      padding: 2px 7px;
+      margin-left: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">
+        <span class="dot"></span>
+        <strong>FusionEdge</strong>
+        <span class="sim-tag">Simulation</span>
+      </div>
+
+      <h1>Create your account</h1>
+      <p class="lede">
+        Register, pick a plan, and get access right away — no payment while we
+        finish building checkout.
+      </p>
+
+      <form id="signup">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="email" required />
+        </div>
+
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="new-password"
+                 minlength="6" required placeholder="At least 6 characters" />
+        </div>
+
+        <fieldset>
+          <label>Choose a plan</label>
+          <div class="plans">
+            <label class="plan">
+              <input type="radio" name="plan" value="fusionedge" checked />
+              <span>
+                <span class="name">FusionEdge only</span>
+                <span class="access">Palette drag-into-Revit · plugin tools locked</span>
+              </span>
+            </label>
+            <label class="plan">
+              <input type="radio" name="plan" value="plugin" />
+              <span>
+                <span class="name">Revit Plugin only</span>
+                <span class="access">Plugin tools · palette drag off</span>
+              </span>
+            </label>
+            <label class="plan">
+              <input type="radio" name="plan" value="bundle" />
+              <span>
+                <span class="name">Bundle</span>
+                <span class="access">Everything — palette drag and plugin tools</span>
+              </span>
+            </label>
+          </div>
+        </fieldset>
+
+        <button class="submit" type="submit" id="go">
+          Create account and activate (no payment)
+        </button>
+      </form>
+
+      <div class="msg" id="msg"></div>
+
+      <p class="foot">
+        A stand-in for the real pricing &amp; checkout page. Access is decided by
+        your subscription row, not by how it was created.
+      </p>
+    </div>
+  </div>
+
+  <!-- Same Supabase project as the plugin login page. -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+  <script>
+    const SUPABASE_URL = "https://txgxonwcdrxayurzjcwb.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_IU-BXBzEGSV9Y_4yKMhuAQ_VaCjkavC";
+
+    const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const form = document.getElementById("signup");
+    const btn = document.getElementById("go");
+    const msgEl = document.getElementById("msg");
+
+    function show(kind, text) {
+      msgEl.className = "msg show " + kind;
+      msgEl.textContent = text;
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const plan = form.plan.value;
+
+      btn.disabled = true;
+      show("info", "Creating your account…");
+
+      try {
+        // 1. Register. If "Confirm email" is ON, there's no session yet.
+        const { data: signUp, error: signUpErr } =
+          await client.auth.signUp({ email, password });
+        if (signUpErr) throw signUpErr;
+
+        // 2. Make sure we have a session. With confirmation off, sign-up
+        //    returns one; otherwise try a direct sign-in (works once the
+        //    user has confirmed and resubmits).
+        let session = signUp.session;
+        if (!session) {
+          const { data: signIn, error: signInErr } =
+            await client.auth.signInWithPassword({ email, password });
+          if (signInErr || !signIn.session) {
+            show(
+              "info",
+              "Account created. Please confirm your email from the link we " +
+              "sent, then submit this form again to activate your plan."
+            );
+            btn.disabled = false;
+            return;
+          }
+          session = signIn.session;
+        }
+
+        // 3. Activate the chosen plan — no payment (simulation only).
+        const { error: subErr } =
+          await client.rpc("simulate_subscribe", { p_plan_id: plan });
+        if (subErr) throw subErr;
+
+        show(
+          "ok",
+          "You're all set — your " + planLabel(plan) + " plan is active. " +
+          "Open the Revit plugin and sign in; the right tools will unlock."
+        );
+        form.reset();
+      } catch (err) {
+        show("err", err.message || "Something went wrong. Please try again.");
+      } finally {
+        btn.disabled = false;
+      }
+    });
+
+    function planLabel(id) {
+      return { fusionedge: "FusionEdge only", plugin: "Revit Plugin only",
+               bundle: "FusionEdge + Plugin" }[id] || id;
+    }
+  </script>
+</body>
+</html>

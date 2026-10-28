@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link, useParams } from 'react-router-dom'
 import {
   getProductBySlug,
   getRelatedProducts,
   incrementProductView,
+  logDownload,
   findVariation,
   imagesFor,
   effectivePrice,
@@ -580,6 +582,134 @@ function SaveButton({ product, variation }) {
   )
 }
 
+// Download control for logged-in users. If the figure is marked as an rfa
+// (data-cim-kind === 'rfa') it downloads the family at data-cim-url; otherwise
+// it falls back to downloading the product image. Clicking opens a side-slide
+// confirmation (the same drawer pattern as the filters) before the download
+// actually starts.
+function DownloadButton({ product, variation, cim, image }) {
+  const { user } = useAuth()
+  const [open, setOpen] = useState(false)
+
+  // Lock page scroll while the confirm drawer is open.
+  useEffect(() => {
+    if (!open) return
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [open])
+
+  // What would be downloaded, resolved from the data-cim-* attributes.
+  const isRfa = (cim['data-cim-kind'] || '').trim().toLowerCase() === 'rfa'
+  const rfaUrl = cim['data-cim-url']
+  const href = isRfa && rfaUrl ? rfaUrl : image?.url
+  // Paint products are excluded from download entirely.
+  const isPaint = (product.category?.slug || '').toLowerCase() === 'paint'
+  // Only for signed-in users, outside the Paint category, and when there's
+  // actually something to get.
+  if (!user || isPaint || !href) return null
+
+  const fileName = href.split('/').pop()?.split('?')[0] || product.name
+  const kindLabel = isRfa && rfaUrl ? 'Revit family (.rfa)' : 'Product image'
+
+  const confirm = () => {
+    // A plain anchor click triggers the browser download (or navigation for a
+    // cross-origin file the server marks inline — same as a normal link).
+    const a = document.createElement('a')
+    a.href = href
+    a.download = fileName
+    a.rel = 'noopener'
+    document.body.appendChild(a)
+    a.click()
+    a.remove()
+
+    // Record it in the user's download history (best-effort; never blocks the
+    // download the user just confirmed).
+    logDownload({
+      productId: product.id,
+      variationId: variation?.id ?? null,
+      kind: isRfa && rfaUrl ? 'rfa' : 'image',
+      fileName,
+      fileUrl: href,
+    })
+
+    setOpen(false)
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className="btn-save btn-download"
+        onClick={() => setOpen(true)}
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M12 3v12m0 0 4-4m-4 4-4-4" />
+          <path d="M5 21h14" />
+        </svg>
+        {isRfa && rfaUrl ? 'Download .rfa' : 'Download image'}
+      </button>
+
+      {/* Portaled to <body> so the fixed drawer escapes .detail-body's
+          fade-up transform (a transformed ancestor would trap position:fixed
+          and collapse the panel next to the button). */}
+      {createPortal(
+        <div className={open ? 'drawer-root filter-root open' : 'drawer-root filter-root'}>
+          <div className="drawer-backdrop" onClick={() => setOpen(false)} />
+          <aside className="filter-drawer download-drawer" role="dialog" aria-modal="true" aria-label="Confirm download">
+            <div className="drawer-head">
+              <strong>Confirm download</strong>
+              <button
+                type="button"
+                className="drawer-close"
+                aria-label="Close"
+                onClick={() => setOpen(false)}
+              >
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="download-summary">
+              {product.brand?.name && (
+                <span className="detail-maker">{product.brand.name}</span>
+              )}
+              <h3>{product.name}</h3>
+              <dl className="download-meta">
+                <div>
+                  <dt>Type</dt>
+                  <dd>{kindLabel}</dd>
+                </div>
+                <div>
+                  <dt>File</dt>
+                  <dd className="mono-value">{fileName}</dd>
+                </div>
+              </dl>
+              {isRfa && rfaUrl && (
+                <p className="download-note">
+                  For use in your Revit project. Opens in Revit 2022 or later.
+                </p>
+              )}
+            </div>
+
+            <div className="filter-foot">
+              <button type="button" className="linkish" onClick={() => setOpen(false)}>
+                Cancel
+              </button>
+              <button type="button" className="filter-apply" onClick={confirm}>
+                Download
+              </button>
+            </div>
+          </aside>
+        </div>,
+        document.body
+      )}
+    </>
+  )
+}
+
 export default function Product() {
   const { slug } = useParams()
   const { data: product, loading, error } = useAsync(
@@ -698,6 +828,10 @@ export default function Product() {
   const isVariable = product.kind === 'variable'
   const out = isVariable ? !!variation && !variation.in_stock : !product.in_stock
 
+  // The same data-cim-* attributes projected onto the figure. Computed once and
+  // shared with the download control, which reads data-cim-kind / data-cim-url.
+  const cim = dataAttributesFor(product, selection, variation)
+
   return (
     <>
     <article className="detail">
@@ -712,7 +846,7 @@ export default function Product() {
           images={gallery}
           name={product.name}
           swatchFallback={swatchFallback}
-          figureProps={dataAttributesFor(product, selection, variation)}
+          figureProps={cim}
         />
       </div>
 
@@ -767,7 +901,10 @@ export default function Product() {
         )}
         {out && <p className="error">Out of stock.</p>}
 
-        <SaveButton product={product} variation={variation} />
+        <div className="detail-actions">
+          <DownloadButton product={product} variation={variation} cim={cim} image={gallery[0]} />
+          <SaveButton product={product} variation={variation} />
+        </div>
 
         <dl className="detail-meta">
           {(variation?.sku ?? product.sku) && (

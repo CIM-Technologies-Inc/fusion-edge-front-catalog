@@ -391,6 +391,55 @@ export async function unsaveItem(savedItemId) {
   )
 }
 
+// ------------------------------------------------------- download history
+
+// Record a confirmed download. Best-effort: a failed log must never block the
+// download the user already confirmed, so this swallows errors. Requires the
+// 0004_download_history migration.
+export async function logDownload({
+  productId,
+  variationId = null,
+  kind,
+  fileName,
+  fileUrl,
+}) {
+  try {
+    const { data } = await supabase.auth.getUser()
+    const userId = data?.user?.id
+    if (!userId) return
+    await supabase.from('download_history').insert({
+      user_id: userId,
+      product_id: productId,
+      variation_id: variationId,
+      kind,
+      file_name: fileName,
+      file_url: fileUrl,
+    })
+  } catch {
+    // ignore — history logging is non-critical
+  }
+}
+
+// The current user's downloads, newest first, with enough product detail to
+// render a history row. RLS scopes this to the caller's own rows.
+export async function getDownloadHistory(limit = 50) {
+  return unwrap(
+    await supabase
+      .from('download_history')
+      .select(
+        `
+        id, kind, file_name, file_url, created_at, variation_id,
+        product:products(
+          id, name, slug,
+          images:product_images(url, alt, position, variation_id)
+        )
+      `
+      )
+      .order('created_at', { ascending: false })
+      .limit(limit)
+  )
+}
+
 // Is this product (or variation) already in the library? Returns the saved
 // row's id so the UI can toggle without a second lookup.
 export async function findSavedItem(productId, variationId = null) {

@@ -64,3 +64,11 @@ export async function signIn(email, password) {
 export function signOut() {
   return supabase.auth.signOut()
 }
+
+// SIMULATION ONLY — activate a plan for the signed-in user with no payment,
+// via the simulate_subscribe() RPC. Requires an active session (auth.uid()).
+// Mirrors signup_sim.html; must be removed when real checkout (PayMongo) ships.
+// Plan ids match public.plans: 'fusionedge' | 'plugin' | 'bundle'.
+export function simulateSubscribe(planId) {
+  return supabase.rpc('simulate_subscribe', { p_plan_id: planId })
+}

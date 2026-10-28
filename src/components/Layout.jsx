@@ -333,7 +333,7 @@ function Footer() {
       <div className="footer-inner">
         <Link to="/" className="logo light" aria-label="Fusion Edge home">
           <img
-            src="/log-fusion-dark.png"
+            src="/fusion-edgev2-dark.png"
             alt="Fusion Edge"
             className="footer-logo-img"
             width="720"
