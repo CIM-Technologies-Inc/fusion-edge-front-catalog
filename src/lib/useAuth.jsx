@@ -4,6 +4,7 @@ import {
   AuthContext,
   isCustomerAccount,
   postSessionToCimPlugin,
+  listenForCimSession,
 } from './auth'
 
 export function AuthProvider({ children }) {
@@ -49,9 +50,17 @@ export function AuthProvider({ children }) {
         setUser(u)
       }
     )
+
+    // Reverse direction: accept a session the plugin pushes, and request one if
+    // we're inside the panel but signed out. No-op on the normal web. When
+    // setSession succeeds, onAuthStateChange above fires and hands it back —
+    // the plugin ignores a session it already holds.
+    const stopCimListener = listenForCimSession()
+
     return () => {
       active = false
       sub.subscription.unsubscribe()
+      stopCimListener()
     }
   }, [])
 

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { signIn, signUp, simulateSubscribe } from '../lib/auth'
+import { useToast } from '../lib/toast'
 
 // SIMULATION ONLY — plan options mirror public.plans / signup_sim.html. When
 // real checkout (PayMongo) ships, drop the picker and the simulateSubscribe
@@ -29,6 +30,7 @@ const PENDING_PLAN_KEY = 'fe_pending_plan'
 
 export default function SignIn() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [mode, setMode] = useState('signin')
   const [form, setForm] = useState({ email: '', password: '', fullName: '' })
   const [plan, setPlan] = useState('fusionedge')
@@ -40,11 +42,19 @@ export default function SignIn() {
 
     if (mode === 'signin') {
       const { error } = await signIn(form.email, form.password)
-      if (error) return setStatus({ error: error.message })
+      if (error) {
+        setStatus({ error: error.message })
+        toast.error(error.message)
+        return
+      }
       // Activate a plan chosen at sign-up but deferred until the user had a
       // session (the email-confirmation path). Best-effort; never blocks login.
       await activatePendingPlan()
-      return navigate('/')
+      setStatus(null)
+      toast.success('Signed in — welcome back.')
+      // Brief pause so the toast is seen before the page changes.
+      setTimeout(() => navigate('/'), 600)
+      return
     }
 
     // Sign up. If email confirmation is ON, a new customer has NO session yet —
@@ -56,7 +66,11 @@ export default function SignIn() {
       form.password,
       form.fullName
     )
-    if (error) return setStatus({ error: error.message })
+    if (error) {
+      setStatus({ error: error.message })
+      toast.error(error.message)
+      return
+    }
 
     // Supabase doesn't error when the email is already registered (it avoids
     // leaking which emails exist). On a project with email confirmation ON, a
@@ -66,26 +80,33 @@ export default function SignIn() {
     const alreadyRegistered =
       !data?.session && (data?.user?.identities?.length ?? 0) === 0
     if (alreadyRegistered) {
-      setStatus({
-        error:
-          'An account with this email already exists. Try signing in instead.',
-      })
+      const msg =
+        'An account with this email already exists. Try signing in instead.'
+      setStatus({ error: msg })
+      toast.error(msg)
       return
     }
 
     if (data?.session) {
       const { error: subErr } = await simulateSubscribe(plan)
-      if (subErr) return setStatus({ error: subErr.message })
-      return navigate('/')
+      if (subErr) {
+        setStatus({ error: subErr.message })
+        toast.error(subErr.message)
+        return
+      }
+      setStatus(null)
+      toast.success('Account created — your plan is active. Welcome!')
+      setTimeout(() => navigate('/'), 700)
+      return
     }
 
     // No session yet: remember the plan and finish activation after sign-in.
     try {
       sessionStorage.setItem(PENDING_PLAN_KEY, plan)
     } catch { /* ignore storage failures */ }
-    setStatus({
-      info: `Almost there — we sent a confirmation link to ${form.email}. Click it to activate your account, then sign in and your plan turns on.`,
-    })
+    const info = `Almost there — we sent a confirmation link to ${form.email}. Click it to activate your account, then sign in and your plan turns on.`
+    setStatus({ info })
+    toast.info('Check your email to confirm your account.', 6000)
     setMode('signin')
   }
 
@@ -184,7 +205,13 @@ export default function SignIn() {
           )}
 
           <button type="submit" disabled={status?.busy}>
-            {isSignup ? 'Create account' : 'Sign in'}
+            {status?.busy
+              ? isSignup
+                ? 'Creating account…'
+                : 'Signing in…'
+              : isSignup
+                ? 'Create account'
+                : 'Sign in'}
           </button>
           {status?.error && <p className="error">{status.error}</p>}
           {status?.info && <p className="info">{status.info}</p>}

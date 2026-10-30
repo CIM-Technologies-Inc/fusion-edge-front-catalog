@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth, signOut } from '../lib/auth'
+import { useToast } from '../lib/toast'
 import { getCategories } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import Logo from './Logo'
@@ -62,6 +63,8 @@ function DesktopNav({ items }) {
 // on backdrop click; locks body scroll while open.
 function MobileNav({ open, onClose }) {
   const { user } = useAuth()
+  const toast = useToast()
+  const navigate = useNavigate()
   const location = useLocation()
   const items = useNavItems()
 
@@ -129,7 +132,15 @@ function MobileNav({ open, onClose }) {
             <HeartIcon /> Your library
           </Link>
           {user ? (
-            <button type="button" onClick={() => { signOut(); onClose() }}>
+            <button
+              type="button"
+              onClick={async () => {
+                onClose()
+                await signOut()
+                toast.success('Signed out.')
+                navigate('/dashboard')
+              }}
+            >
               <UserIcon /> Sign out
             </button>
           ) : (
@@ -212,6 +223,7 @@ function SearchBox() {
 // visibly reflect a successful login.
 function AccountMenu() {
   const { user } = useAuth()
+  const toast = useToast()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
@@ -280,9 +292,11 @@ function AccountMenu() {
             type="button"
             role="menuitem"
             className="account-signout"
-            onClick={() => {
+            onClick={async () => {
               setOpen(false)
-              signOut()
+              await signOut()
+              toast.success('Signed out.')
+              navigate('/dashboard')
             }}
           >
             Sign out

@@ -85,6 +85,45 @@ export function postSessionToCimPlugin(session) {
   } catch { /* ignore — not in the plugin panel, or bridge unavailable */ }
 }
 
+// Listen for a session pushed FROM the CIM Revit plugin (plugin -> site) and
+// sign the site in with it, and — when we're inside the panel but not signed in
+// — ask the plugin for its session (covers the user having signed in via the
+// plugin's own Account window before this page loaded). Returns a cleanup fn.
+// No-op outside the plugin's WebView2 panel. Pairs with postSessionToCimPlugin.
+export function listenForCimSession() {
+  const bridge =
+    typeof window !== 'undefined' && window.chrome && window.chrome.webview
+  if (!bridge) return () => {}
+
+  const onMessage = (ev) => {
+    let msg
+    try {
+      msg = JSON.parse(ev.data)
+    } catch {
+      return
+    }
+    if (msg?.type === 'cim-set-session' && msg.access_token) {
+      supabase.auth.setSession({
+        access_token: msg.access_token,
+        refresh_token: msg.refresh_token,
+      })
+    }
+  }
+
+  bridge.addEventListener('message', onMessage)
+
+  // If we're in the panel and not signed in yet, ask the plugin for its session.
+  supabase.auth.getSession().then(({ data }) => {
+    if (!data.session) {
+      try {
+        bridge.postMessage(JSON.stringify({ type: 'cim-request-session' }))
+      } catch { /* ignore */ }
+    }
+  })
+
+  return () => bridge.removeEventListener('message', onMessage)
+}
+
 // SIMULATION ONLY — activate a plan for the signed-in user with no payment,
 // via the simulate_subscribe() RPC. Requires an active session (auth.uid()).
 // Mirrors signup_sim.html; must be removed when real checkout (PayMongo) ships.
