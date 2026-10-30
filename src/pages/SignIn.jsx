@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { signIn, signUp, simulateSubscribe } from '../lib/auth'
+import { signIn, signUp, simulateSubscribe, isEmbeddedInCim } from '../lib/auth'
 import { useToast } from '../lib/toast'
 
 // SIMULATION ONLY — plan options mirror public.plans / signup_sim.html. When
@@ -31,7 +31,10 @@ const PENDING_PLAN_KEY = 'fe_pending_plan'
 export default function SignIn() {
   const navigate = useNavigate()
   const toast = useToast()
-  const [mode, setMode] = useState('signin')
+  // Inside the plugin panel the only reason this page opens is account
+  // creation (the plugin's "Create an account" link) — the plugin owns sign-in.
+  // So start on the sign-up form when embedded; on the web, default to sign-in.
+  const [mode, setMode] = useState(isEmbeddedInCim() ? 'signup' : 'signin')
   const [form, setForm] = useState({ email: '', password: '', fullName: '' })
   const [plan, setPlan] = useState('fusionedge')
   const [status, setStatus] = useState(null)
