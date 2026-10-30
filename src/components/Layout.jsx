@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { useAuth, signOut } from '../lib/auth'
+import { useAuth, signOut, isEmbeddedInCim } from '../lib/auth'
 import { useToast } from '../lib/toast'
 import { getCategories, getMySubscription } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
@@ -8,6 +8,13 @@ import Logo from './Logo'
 import Breadcrumbs from './Breadcrumbs'
 import { BreadcrumbContext } from '../lib/breadcrumbs'
 import { SearchIcon, UserIcon, HeartIcon, Caret, Burger, Close } from './Icons'
+
+// When the site runs inside the Revit plugin's panel, the plugin's Account
+// button is the ONE place to sign in / out — so hide the site's own sign-in /
+// sign-out / account controls to avoid a second, competing login door. The
+// sign-up / create-account flow stays reachable (the plugin opens it on
+// purpose for new users). Constant per page load.
+const EMBEDDED = isEmbeddedInCim()
 
 // Build the nav from a live category list. "Product" carries the categories as
 // children: it still links to /products, and reveals a category dropdown.
@@ -131,23 +138,26 @@ function MobileNav({ open, onClose }) {
           <Link to="/library" onClick={onClose}>
             <HeartIcon /> Your library
           </Link>
-          {user ? (
-            <button
-              type="button"
-              onClick={async () => {
-                onClose()
-                await signOut()
-                toast.success('Signed out.')
-                navigate('/dashboard')
-              }}
-            >
-              <UserIcon /> Sign out
-            </button>
-          ) : (
-            <Link to="/signin" onClick={onClose}>
-              <UserIcon /> Sign in
-            </Link>
-          )}
+          {/* Embedded in the plugin: no sign-in/out here — the plugin's
+              Account button is the one door. */}
+          {!EMBEDDED &&
+            (user ? (
+              <button
+                type="button"
+                onClick={async () => {
+                  onClose()
+                  await signOut()
+                  toast.success('Signed out.')
+                  navigate('/dashboard')
+                }}
+              >
+                <UserIcon /> Sign out
+              </button>
+            ) : (
+              <Link to="/signin" onClick={onClose}>
+                <UserIcon /> Sign in
+              </Link>
+            ))}
         </div>
       </aside>
     </div>
@@ -350,7 +360,10 @@ function Header({ onOpenMenu, menuOpen }) {
           <Link to="/library" aria-label="Your library">
             <HeartIcon />
           </Link>
-          <AccountMenu />
+          {/* Embedded in the plugin: hide the account menu (the sign-in link
+              and the signed-in sign-out control). The plugin's Account button
+              owns sign-in/out. Sign-up stays reachable via /signin directly. */}
+          {!EMBEDDED && <AccountMenu />}
         </div>
       </div>
     </header>

@@ -65,6 +65,18 @@ export function signOut() {
   return supabase.auth.signOut()
 }
 
+// True when the site is running inside the CIM Revit plugin's WebView2 panel.
+// window.chrome.webview exists only there; undefined in a normal browser. Used
+// to hide the site's own sign-in / sign-out controls when embedded, so the
+// plugin's Account button is the single sign-in/out door ("one door").
+export function isEmbeddedInCim() {
+  return !!(
+    typeof window !== 'undefined' &&
+    window.chrome &&
+    window.chrome.webview
+  )
+}
+
 // Hands the current Supabase session to the CIM Revit plugin, but ONLY when the
 // site is running inside the plugin's WebView2 panel. window.chrome.webview
 // exists only there; in a normal browser it's undefined, so this is a no-op on
