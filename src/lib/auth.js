@@ -108,6 +108,10 @@ export function listenForCimSession() {
         refresh_token: msg.refresh_token,
       })
     }
+    // Mirror a sign-out initiated in the plugin's own Account window.
+    if (msg?.type === 'cim-sign-out') {
+      supabase.auth.signOut()
+    }
   }
 
   bridge.addEventListener('message', onMessage)
