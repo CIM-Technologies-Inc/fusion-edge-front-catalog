@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useState } from 'react'
+import { createContext, useCallback, useContext, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 
 // Minimal toast system — a context provider plus a fixed, portalled stack.
@@ -14,6 +14,10 @@ let nextId = 0
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([])
+  // Remembers the last toast's identity + time, to swallow an identical one
+  // fired again within a short window (React StrictMode double-invokes, or two
+  // code paths announcing the same event). Keeps one clean toast per event.
+  const lastRef = useRef({ key: null, at: 0 })
 
   const remove = useCallback((id) => {
     setToasts((list) => list.filter((t) => t.id !== id))
@@ -21,6 +25,13 @@ export function ToastProvider({ children }) {
 
   const push = useCallback(
     (type, message, duration = 4000) => {
+      const now = Date.now()
+      const key = `${type}:${message}`
+      if (lastRef.current.key === key && now - lastRef.current.at < 1000) {
+        return null // duplicate within 1s — ignore
+      }
+      lastRef.current = { key, at: now }
+
       const id = ++nextId
       setToasts((list) => [...list, { id, type, message }])
       if (duration) setTimeout(() => remove(id), duration)

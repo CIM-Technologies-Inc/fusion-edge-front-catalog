@@ -115,16 +115,23 @@ export function listenForCimSession({ onSetSession, onSignOut } = {}) {
       return
     }
     if (msg?.type === 'cim-set-session' && msg.access_token) {
-      supabase.auth
-        .setSession({
-          access_token: msg.access_token,
-          refresh_token: msg.refresh_token,
-        })
-        .then(({ error }) => {
-          // Let the app announce the plugin-initiated sign-in (a toast). Normal
-          // web sign-ins are announced by the sign-in page instead.
-          if (!error) onSetSession?.()
-        })
+      // On every load inside the panel we request a session, so the plugin
+      // re-pushes cim-set-session even when we're already signed in as that
+      // user. Only announce (toast) a genuine transition — no prior session, or
+      // a different user — so a plain page refresh doesn't fire a sign-in toast.
+      supabase.auth.getUser().then(({ data: before }) => {
+        const prevId = before?.user?.id ?? null
+        supabase.auth
+          .setSession({
+            access_token: msg.access_token,
+            refresh_token: msg.refresh_token,
+          })
+          .then(({ data, error }) => {
+            if (error) return
+            const newId = data?.user?.id ?? null
+            if (newId && newId !== prevId) onSetSession?.()
+          })
+      })
     }
     // Mirror a sign-out initiated in the plugin's own Account window.
     if (msg?.type === 'cim-sign-out') {
