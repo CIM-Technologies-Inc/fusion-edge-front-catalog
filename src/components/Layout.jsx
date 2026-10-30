@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth, signOut } from '../lib/auth'
 import { useToast } from '../lib/toast'
-import { getCategories } from '../lib/queries'
+import { getCategories, getMySubscription } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import Logo from './Logo'
 import Breadcrumbs from './Breadcrumbs'
@@ -221,12 +221,27 @@ function SearchBox() {
 // dropdown with the account's name/email and links to their pages. Signed out,
 // the same slot is a plain link to /signin. This is what makes the header
 // visibly reflect a successful login.
+const PLAN_NAMES = {
+  fusionedge: 'FusionEdge only',
+  plugin: 'Revit Plugin only',
+  bundle: 'FusionEdge + Plugin',
+}
+
 function AccountMenu() {
   const { user } = useAuth()
   const toast = useToast()
   const navigate = useNavigate()
   const [open, setOpen] = useState(false)
   const ref = useRef(null)
+
+  // Fetch the current plan lazily — only once the menu is opened.
+  const { data: sub } = useAsync(
+    () => (open ? getMySubscription() : Promise.resolve(null)),
+    [open, user?.id]
+  )
+  const planName = sub
+    ? sub.plan?.name ?? PLAN_NAMES[sub.plan_id] ?? sub.plan_id
+    : null
 
   // Close on outside click / Escape while open.
   useEffect(() => {
@@ -281,6 +296,7 @@ function AccountMenu() {
           <div className="account-head">
             <strong>{name}</strong>
             {user.email && <small>{user.email}</small>}
+            {planName && <span className="account-plan">{planName}</span>}
           </div>
           <button type="button" role="menuitem" onClick={() => go('/dashboard')}>
             Dashboard

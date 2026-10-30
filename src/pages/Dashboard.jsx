@@ -1,8 +1,81 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { getSavesByHourToday } from '../lib/queries'
+import { getSavesByHourToday, getMySubscription } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
-import { useAuth } from '../lib/auth'
+import { useAuth, simulateSubscribe } from '../lib/auth'
+import { useToast } from '../lib/toast'
+
+// SIMULATION ONLY — same plans as the signup picker. Remove the switch controls
+// (and simulateSubscribe) when real checkout ships; the display can stay.
+const PLANS = [
+  { id: 'fusionedge', name: 'FusionEdge only' },
+  { id: 'plugin', name: 'Revit Plugin only' },
+  { id: 'bundle', name: 'FusionEdge + Plugin' },
+]
+
+// Current plan + the ability to switch it (simulation). Reads the user's
+// subscription on mount and after a change, so the plan shown is always fresh.
+function PlanCard() {
+  const toast = useToast()
+  const [reloadKey, setReloadKey] = useState(0)
+  const [busy, setBusy] = useState(null)
+  const { data: sub, loading } = useAsync(() => getMySubscription(), [reloadKey])
+
+  const currentId = sub?.plan?.id ?? sub?.plan_id ?? null
+  const currentName =
+    sub?.plan?.name ?? PLANS.find((p) => p.id === currentId)?.name ?? null
+
+  async function choose(planId) {
+    if (planId === currentId || busy) return
+    setBusy(planId)
+    const { error } = await simulateSubscribe(planId)
+    setBusy(null)
+    if (error) return toast.error(error.message)
+    toast.success(
+      `Plan updated to ${PLANS.find((p) => p.id === planId)?.name}.`
+    )
+    setReloadKey((k) => k + 1) // re-read so the card reflects the new plan
+  }
+
+  return (
+    <div className="plan-card">
+      <div className="plan-card-head">
+        <span className="stat-label">Your plan</span>
+        {loading ? (
+          <strong className="plan-current">—</strong>
+        ) : currentName ? (
+          <strong className="plan-current">
+            {currentName}
+            {sub?.status && sub.status !== 'active' && (
+              <span className="plan-status"> · {sub.status}</span>
+            )}
+          </strong>
+        ) : (
+          <strong className="plan-current plan-none">No active plan</strong>
+        )}
+      </div>
+
+      <p className="plan-hint">Switch plan (simulation — no payment):</p>
+      <div className="plan-switch">
+        {PLANS.map((p) => {
+          const on = p.id === currentId
+          return (
+            <button
+              key={p.id}
+              type="button"
+              className={on ? 'plan-pill on' : 'plan-pill'}
+              aria-pressed={on}
+              disabled={busy !== null}
+              onClick={() => choose(p.id)}
+            >
+              {busy === p.id ? 'Updating…' : p.name}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
 
 const fmtHour = (h) => {
   const period = h < 12 ? 'am' : 'pm'
@@ -103,6 +176,8 @@ export default function Dashboard() {
         <h1>Your activity</h1>
         <p className="muted">{today}</p>
       </header>
+
+      <PlanCard />
 
       <div className="stat-row">
         <div className="stat-tile">

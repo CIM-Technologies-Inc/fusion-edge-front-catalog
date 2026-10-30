@@ -211,6 +211,18 @@ main {
   white-space: nowrap;
 }
 
+.account-plan {
+  align-self: flex-start;
+  margin-top: 0.4rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  color: var(--fe-navy, #0e4185);
+  background: var(--fe-brand-soft, #e6eef9);
+}
+
 .account-menu [role='menuitem'] {
   width: 100%;
   text-align: left;
@@ -2606,6 +2618,82 @@ main {
   grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr));
   gap: 1rem;
   margin-bottom: 2.5rem;
+}
+
+/* Plan card — current plan + switch controls (simulation). */
+.plan-card {
+  border: 1px solid var(--fe-line, var(--line));
+  border-radius: var(--fe-radius-md, 6px);
+  background: var(--fe-surface-raised, #fff);
+  padding: 1.3rem 1.4rem;
+  margin-bottom: 2rem;
+}
+
+.plan-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.plan-current {
+  font-family: var(--font-display, inherit);
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: var(--fe-navy, var(--ink));
+}
+
+.plan-current.plan-none {
+  color: var(--fe-ink-muted, var(--muted, #5a6b82));
+  font-weight: 500;
+}
+
+.plan-status {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #d14343;
+  text-transform: capitalize;
+}
+
+.plan-hint {
+  font-size: 0.82rem;
+  color: var(--fe-ink-muted, var(--muted, #5a6b82));
+  margin: 1rem 0 0.6rem;
+}
+
+.plan-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.plan-pill {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--fe-line, var(--line));
+  border-radius: 999px;
+  background: #fff;
+  color: var(--fe-ink, var(--ink));
+  cursor: pointer;
+  transition: border-color 0.14s, background 0.14s, color 0.14s;
+}
+
+.plan-pill:hover:not(:disabled) {
+  border-color: #c3d2e8;
+}
+
+.plan-pill.on {
+  background: var(--fe-navy, #0e4185);
+  border-color: var(--fe-navy, #0e4185);
+  color: #fff;
+  cursor: default;
+}
+
+.plan-pill:disabled {
+  opacity: 0.55;
+  cursor: default;
 }
 
 .stat-tile {

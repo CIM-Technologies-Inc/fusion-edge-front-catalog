@@ -8,6 +8,22 @@ function unwrap({ data, error }) {
   return data
 }
 
+// The signed-in user's current subscription (plan + status + period end),
+// joined to the plan's display name. Null when they have no subscription row.
+// RLS limits the result to the caller's own row.
+export async function getMySubscription() {
+  const { data: auth } = await supabase.auth.getUser()
+  const userId = auth?.user?.id
+  if (!userId) return null
+  return unwrap(
+    await supabase
+      .from('subscriptions')
+      .select('plan_id, status, current_period_end, plan:plans(id, name)')
+      .eq('owner_user_id', userId)
+      .maybeSingle()
+  )
+}
+
 export async function getCategories() {
   return unwrap(
     await supabase.from('categories').select('*').order('position').order('name')
