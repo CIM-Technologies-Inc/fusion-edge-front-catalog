@@ -335,6 +335,7 @@ function AccountMenu() {
 
 function Header({ onOpenMenu, menuOpen }) {
   const items = useNavItems()
+  const { user } = useAuth()
 
   return (
     <header className="topbar">
@@ -364,6 +365,13 @@ function Header({ onOpenMenu, menuOpen }) {
               and the signed-in sign-out control). The plugin's Account button
               owns sign-in/out. Sign-up stays reachable via /signin directly. */}
           {!EMBEDDED && <AccountMenu />}
+          {/* Embedded + signed in: the account menu is hidden, so surface a
+              direct link to the dashboard (the user's one way in). */}
+          {EMBEDDED && user && (
+            <Link to="/dashboard" className="embedded-dash" aria-label="Dashboard">
+              <UserIcon /> Dashboard
+            </Link>
+          )}
         </div>
       </div>
     </header>

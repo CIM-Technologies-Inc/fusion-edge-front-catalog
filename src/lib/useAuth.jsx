@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { supabase, isConfigured } from './supabase'
+import { useToast } from './toast'
 import {
   AuthContext,
   isCustomerAccount,
@@ -8,6 +9,11 @@ import {
 } from './auth'
 
 export function AuthProvider({ children }) {
+  // Held in a ref so the mount-once auth effect can call the current toast
+  // without taking `toast` as a dependency (it's rebuilt each render).
+  const toast = useToast()
+  const toastRef = useRef(toast)
+  toastRef.current = toast
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
 
@@ -55,7 +61,12 @@ export function AuthProvider({ children }) {
     // we're inside the panel but signed out. No-op on the normal web. When
     // setSession succeeds, onAuthStateChange above fires and hands it back —
     // the plugin ignores a session it already holds.
-    const stopCimListener = listenForCimSession()
+    const stopCimListener = listenForCimSession({
+      onSetSession: () =>
+        toastRef.current.success('Signed in from the Revit plugin.'),
+      onSignOut: () =>
+        toastRef.current.success('Signed out from the Revit plugin.'),
+    })
 
     return () => {
       active = false

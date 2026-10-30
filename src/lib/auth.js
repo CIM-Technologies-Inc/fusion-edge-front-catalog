@@ -102,7 +102,7 @@ export function postSessionToCimPlugin(session) {
 // — ask the plugin for its session (covers the user having signed in via the
 // plugin's own Account window before this page loaded). Returns a cleanup fn.
 // No-op outside the plugin's WebView2 panel. Pairs with postSessionToCimPlugin.
-export function listenForCimSession() {
+export function listenForCimSession({ onSetSession, onSignOut } = {}) {
   const bridge =
     typeof window !== 'undefined' && window.chrome && window.chrome.webview
   if (!bridge) return () => {}
@@ -115,14 +115,20 @@ export function listenForCimSession() {
       return
     }
     if (msg?.type === 'cim-set-session' && msg.access_token) {
-      supabase.auth.setSession({
-        access_token: msg.access_token,
-        refresh_token: msg.refresh_token,
-      })
+      supabase.auth
+        .setSession({
+          access_token: msg.access_token,
+          refresh_token: msg.refresh_token,
+        })
+        .then(({ error }) => {
+          // Let the app announce the plugin-initiated sign-in (a toast). Normal
+          // web sign-ins are announced by the sign-in page instead.
+          if (!error) onSetSession?.()
+        })
     }
     // Mirror a sign-out initiated in the plugin's own Account window.
     if (msg?.type === 'cim-sign-out') {
-      supabase.auth.signOut()
+      supabase.auth.signOut().then(() => onSignOut?.())
     }
   }
 
