@@ -65,6 +65,20 @@ export function signOut() {
   return supabase.auth.signOut()
 }
 
+// Send a password-reset email. The link in it returns the user to /reset-password
+// (a recovery session), where they set a new password. redirectTo must be in
+// Supabase's allowed redirect URLs.
+export function requestPasswordReset(email) {
+  return supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/reset-password`,
+  })
+}
+
+// Set a new password for the user in the current (recovery) session.
+export function updatePassword(password) {
+  return supabase.auth.updateUser({ password })
+}
+
 // True when the site is running inside the CIM Revit plugin's WebView2 panel.
 // window.chrome.webview exists only there; undefined in a normal browser. Used
 // to hide the site's own sign-in / sign-out controls when embedded, so the

@@ -3112,6 +3112,13 @@ main {
   color: #fff;
 }
 
+.auth-forgot {
+  justify-self: flex-end;
+  margin-top: -0.4rem;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
 .auth-alt {
   margin-top: 1.1rem;
   text-align: center;

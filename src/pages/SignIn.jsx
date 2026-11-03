@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { signIn, signUp, simulateSubscribe, isEmbeddedInCim } from '../lib/auth'
 import { useToast } from '../lib/toast'
 
@@ -178,6 +178,13 @@ export default function SignIn() {
               onChange={(e) => setForm({ ...form, password: e.target.value })}
             />
           </label>
+
+          {/* Forgot-password entry, only on the sign-in form — its own page. */}
+          {mode === 'signin' && (
+            <Link to="/forgot-password" className="linklike auth-forgot">
+              Forgot password?
+            </Link>
+          )}
 
           {isSignup && (
             <div className="auth-plans">
