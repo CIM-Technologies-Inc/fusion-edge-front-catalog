@@ -150,7 +150,7 @@ function MobileNav({ open, onClose }) {
                   onClose()
                   await signOut()
                   toast.success('Signed out.')
-                  navigate('/dashboard')
+                  navigate('/')
                 }}
               >
                 <UserIcon /> Sign out
@@ -324,7 +324,7 @@ function AccountMenu() {
               setOpen(false)
               await signOut()
               toast.success('Signed out.')
-              navigate('/dashboard')
+              navigate('/')
             }}
           >
             Sign out
