@@ -39,11 +39,12 @@ export default function ResetPassword() {
       toast.error(error.message)
       return
     }
-    setStatus(null)
-    toast.success('Password updated — you can sign in now.')
-    // Sign out of the recovery session so they sign in fresh with the new one.
+    // Reset only — never leave them logged in. Sign out the recovery session
+    // so they must sign in again with the NEW password on the sign-in page.
     await supabase.auth.signOut()
-    setTimeout(() => navigate('/signin'), 700)
+    setStatus(null)
+    toast.success('Password updated — please sign in with your new password.')
+    navigate('/signin', { replace: true })
   }
 
   return (

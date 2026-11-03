@@ -139,8 +139,10 @@ function MobileNav({ open, onClose }) {
             <HeartIcon /> Your library
           </Link>
           {/* Embedded in the plugin: no sign-in/out here — the plugin's
-              Account button is the one door. */}
+              Account button is the one door. Also hidden on /reset-password,
+              where the recovery session isn't a real login. */}
           {!EMBEDDED &&
+            location.pathname !== '/reset-password' &&
             (user ? (
               <button
                 type="button"
@@ -336,6 +338,13 @@ function AccountMenu() {
 function Header({ onOpenMenu, menuOpen }) {
   const items = useNavItems()
   const { user } = useAuth()
+  const { pathname } = useLocation()
+
+  // On the reset-password page the user holds a temporary recovery session (so
+  // they can set a new password) — but they are NOT really "logged in". Hide
+  // the account/logged-in controls there so it reads as logged-out; they'll
+  // sign in normally afterwards.
+  const hideAccount = pathname === '/reset-password'
 
   return (
     <header className="topbar">
@@ -364,10 +373,10 @@ function Header({ onOpenMenu, menuOpen }) {
           {/* Embedded in the plugin: hide the account menu (the sign-in link
               and the signed-in sign-out control). The plugin's Account button
               owns sign-in/out. Sign-up stays reachable via /signin directly. */}
-          {!EMBEDDED && <AccountMenu />}
+          {!EMBEDDED && !hideAccount && <AccountMenu />}
           {/* Embedded + signed in: the account menu is hidden, so surface a
               direct link to the dashboard (the user's one way in). */}
-          {EMBEDDED && user && (
+          {EMBEDDED && user && !hideAccount && (
             <Link to="/dashboard" className="embedded-dash" aria-label="Dashboard">
               <UserIcon /> Dashboard
             </Link>
