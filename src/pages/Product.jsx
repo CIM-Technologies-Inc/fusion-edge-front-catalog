@@ -14,6 +14,7 @@ import {
   saveItem,
   findSavedItem,
   unsaveItem,
+  getMySubscription,
 } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import { useAuth } from '../lib/auth'
@@ -591,6 +592,14 @@ function DownloadButton({ product, variation, cim, image }) {
   const { user } = useAuth()
   const [open, setOpen] = useState(false)
 
+  // The user's plan decides whether downloading is allowed. Downloading the
+  // .rfa / image is the FusionEdge capability, so a "Revit Plugin only" plan
+  // (plugin) does NOT include it — only 'fusionedge' and 'bundle' do.
+  const { data: sub } = useAsync(
+    () => (user ? getMySubscription() : Promise.resolve(null)),
+    [user?.id]
+  )
+
   // Lock page scroll while the confirm drawer is open.
   useEffect(() => {
     if (!open) return
@@ -609,6 +618,26 @@ function DownloadButton({ product, variation, cim, image }) {
   // Only for signed-in users, outside the Paint category, and when there's
   // actually something to get.
   if (!user || isPaint || !href) return null
+
+  // Plan gate: a Revit-Plugin-only plan can't download (that's a FusionEdge
+  // capability). Only block when we actually know the plan is 'plugin'; while
+  // the plan is still loading (sub === undefined) we don't flash the notice.
+  const planId = sub?.plan?.id ?? sub?.plan_id ?? null
+  const planBlocksDownload = planId === 'plugin'
+  if (planBlocksDownload) {
+    return (
+      <div className="btn-save btn-save-signin is-locked">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <rect x="4" y="11" width="16" height="9" rx="2" />
+          <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+        </svg>
+        <span>
+          Downloads need a FusionEdge plan.{' '}
+          <Link to="/dashboard">Upgrade your plan</Link>
+        </span>
+      </div>
+    )
+  }
 
   const fileName = href.split('/').pop()?.split('?')[0] || product.name
   const kindLabel = isRfa && rfaUrl ? 'Revit family (.rfa)' : 'Product image'

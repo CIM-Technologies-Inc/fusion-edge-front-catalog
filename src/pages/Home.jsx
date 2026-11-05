@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import { getProducts, getCategories, getBrands, getCatalogStats } from '../lib/queries'
 import { useAsync } from '../lib/useAsync'
 import ProductCard from '../components/ProductCard'
+import Reveal from '../components/Reveal'
 import { SkeletonTiles, SkeletonCategoryTiles } from '../components/Skeleton'
 
 
@@ -129,6 +129,118 @@ function HeroFeatures() {
   )
 }
 
+// The differentiator: products drag straight into Revit with specs attached.
+// A two-column band — copy on one side, a labelled drag illustration on the
+// other — pointing at the catalog (and the plugin plans below).
+function RevitShowcase() {
+  const steps = [
+    'Find a material in the catalog',
+    'Drag it onto your Revit model',
+    'Specs, finish and metadata ride along',
+  ]
+
+  return (
+    <section className="revit-showcase">
+      <div className="revit-showcase-inner">
+        <div className="revit-showcase-copy">
+          <p className="eyebrow">Revit plugin</p>
+          <h2>From catalog to your model in one drag</h2>
+          <p className="revit-showcase-text">
+            No more hunting for specs or rebuilding materials by hand. Browse
+            real products, drag them straight into Revit, and every finish,
+            size and spec comes with them — ready to schedule.
+          </p>
+          <ol className="revit-steps">
+            {steps.map((s, i) => (
+              <li key={s}>
+                <span className="revit-step-n">{i + 1}</span>
+                {s}
+              </li>
+            ))}
+          </ol>
+          <div className="revit-showcase-actions">
+            <Link to="/shop" className="btn-solid btn-solid-navy">
+              Browse the catalog
+            </Link>
+            <a href="#plans" className="revit-showcase-link">
+              See plugin plans →
+            </a>
+          </div>
+        </div>
+
+        {/* Lightweight illustration of the drag — no asset needed. A product
+            "chip" arcs toward a Revit drop zone. */}
+        <div className="revit-showcase-art" aria-hidden="true">
+          <div className="revit-chip">
+            <span className="revit-chip-swatch" />
+            <span className="revit-chip-lines">
+              <b />
+              <i />
+            </span>
+          </div>
+          <div className="revit-drop">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 7.5 12 2 3 7.5v9L12 22l9-5.5v-9Z" />
+              <path d="M3 7.5 12 13l9-5.5M12 13v9" />
+            </svg>
+            <span>Drop into Revit</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+// The three subscription plans, as a home-page preview. Mirrors the picker on
+// /signin (same ids and access copy); each card links there to register. The
+// bundle is flagged as the recommended option.
+const HOME_PLANS = [
+  {
+    id: 'fusionedge',
+    name: 'FusionEdge',
+    access: 'Browse the catalog and drag materials into Revit.',
+  },
+  {
+    id: 'bundle',
+    name: 'FusionEdge + Plugin',
+    access: 'Everything — palette drag plus the full plugin toolset.',
+    featured: true,
+  },
+  {
+    id: 'plugin',
+    name: 'Revit Plugin',
+    access: 'The in-Revit plugin tools, without the drag-in palette.',
+  },
+]
+
+function PlansPreview() {
+  return (
+    <section className="plans-preview" id="plans">
+      <h2>Pick the plan that fits how you work</h2>
+      <p className="sub">
+        Start specifying faster — choose a plan and create your account in
+        minutes.
+      </p>
+
+      <div className="plan-cards">
+        {HOME_PLANS.map((p) => (
+          <div
+            key={p.id}
+            className={p.featured ? 'plan-preview-card is-featured' : 'plan-preview-card'}
+          >
+            {p.featured && <span className="plan-preview-flag">Most popular</span>}
+            <h3>{p.name}</h3>
+            <p className="plan-preview-access">{p.access}</p>
+            <Link to="/signin" className="plan-preview-cta">
+              Choose {p.name} →
+            </Link>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+}
+
 function VideoBand() {
   return (
     <section className="video-band">
@@ -190,28 +302,50 @@ function Trending({ products, loading, error }) {
   )
 }
 
-function SearchBar() {
-  const [term, setTerm] = useState('')
-  const navigate = useNavigate()
+// Frequently asked questions, as a native <details> accordion — accessible and
+// JS-free (one can be open at a time is not enforced; several can expand).
+const FAQS = [
+  {
+    q: 'How do products get into Revit?',
+    a: 'With the Fusion Edge plugin installed, you drag a material straight from the catalog palette onto your Revit model. The finish, size, manufacturer and spec metadata come attached — no manual rebuilding.',
+  },
+  {
+    q: 'What is the difference between the plans?',
+    a: 'FusionEdge gives you the catalog and the drag-into-Revit palette. Revit Plugin only unlocks the in-Revit plugin tools. The bundle includes both — the full workflow end to end.',
+  },
+  {
+    q: 'Do I need a paid plan to browse?',
+    a: 'No. You can browse the full catalog and product specs for free. A plan is needed to drag materials into Revit and to use the plugin tools.',
+  },
+  {
+    q: 'Can I use Fusion Edge offline?',
+    a: 'Yes. Once signed in, the plugin keeps working offline for a grace window so a dropped connection never stops your work; it re-checks your subscription when you are back online.',
+  },
+  {
+    q: 'Which Revit versions are supported?',
+    a: 'The plugin targets current Revit releases via WebView2. If you are unsure whether your version is covered, reach out and we will confirm before you subscribe.',
+  },
+]
 
-  const submit = (e) => {
-    e.preventDefault()
-    const q = term.trim()
-    if (q) navigate(`/products?q=${encodeURIComponent(q)}`)
-  }
-
+function Faq() {
   return (
-    <section className="searchbar">
-      <form onSubmit={submit} role="search" aria-label="Product search">
-        <input
-          type="search"
-          value={term}
-          onChange={(e) => setTerm(e.target.value)}
-          placeholder="Enter your keywords..."
-          aria-label="Search products"
-        />
-        <button type="submit">⌕ SEARCH</button>
-      </form>
+    <section className="faq" aria-labelledby="faq-heading">
+      <h2 id="faq-heading">Frequently asked questions</h2>
+      <p className="sub">
+        Everything about the catalog, the Revit plugin and plans — in one place.
+      </p>
+
+      <div className="faq-list">
+        {FAQS.map((item) => (
+          <details className="faq-item" key={item.q}>
+            <summary>
+              {item.q}
+              <span className="faq-mark" aria-hidden="true" />
+            </summary>
+            <p>{item.a}</p>
+          </details>
+        ))}
+      </div>
     </section>
   )
 }
@@ -230,9 +364,13 @@ export default function Home() {
         {/* <BrandMarquee /> */}
       </div>
       <HeroFeatures />
-      <CategoryTiles />
-      <Trending products={products} loading={loading} error={error} />
-      <SearchBar />
+      <Reveal><RevitShowcase /></Reveal>
+      <Reveal><CategoryTiles /></Reveal>
+      <Reveal><PlansPreview /></Reveal>
+      <Reveal>
+        <Trending products={products} loading={loading} error={error} />
+      </Reveal>
+      <Reveal><Faq /></Reveal>
     </>
   )
 }

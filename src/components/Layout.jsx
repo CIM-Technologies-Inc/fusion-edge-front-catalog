@@ -272,8 +272,8 @@ function AccountMenu() {
 
   if (!user) {
     return (
-      <Link to="/signin" aria-label="Sign in">
-        <UserIcon />
+      <Link to="/signin" className="login-btn">
+        Log in
       </Link>
     )
   }
@@ -281,6 +281,15 @@ function AccountMenu() {
   // full_name from signup metadata; fall back to the email's local part.
   const name =
     user.user_metadata?.full_name?.trim() || user.email?.split('@')[0] || 'Account'
+
+  // Up to two initials for the avatar: first letters of the first two words of
+  // the name, e.g. "Patrick Anonuevo" -> "PA"; a single word gives one letter.
+  const initials = name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('')
 
   const go = (to) => {
     setOpen(false)
@@ -297,9 +306,9 @@ function AccountMenu() {
         aria-expanded={open}
         onClick={() => setOpen((o) => !o)}
       >
-        <span className="account-avatar">
-          <UserIcon />
-          <span className="account-dot" aria-hidden="true" />
+        <span className="account-avatar" aria-hidden="true">
+          {initials}
+          <span className="account-dot" />
         </span>
       </button>
 
@@ -331,6 +340,30 @@ function AccountMenu() {
           </button>
         </div>
       )}
+    </div>
+  )
+}
+
+// Thin marketing strip above the header. Always shown (not dismissible).
+// Hidden inside the Revit plugin panel — that's a tool surface, not a
+// storefront, and vertical space is tight.
+const PROMO_TEXT = 'Launch offer'
+const PROMO_MSG = 'Get FusionEdge + Revit Plugin bundle and save on your first year.'
+const PROMO_CTA_TO = '/signin'
+const PROMO_CTA_LABEL = 'See plans'
+
+function PromoStrip() {
+  if (EMBEDDED) return null
+
+  return (
+    <div className="promo-strip" role="region" aria-label="Announcement">
+      <p className="promo-strip-msg">
+        <span className="promo-strip-tag">{PROMO_TEXT}</span>
+        {PROMO_MSG}{' '}
+        <Link to={PROMO_CTA_TO} className="promo-strip-cta">
+          {PROMO_CTA_LABEL} &rarr;
+        </Link>
+      </p>
     </div>
   )
 }
@@ -367,9 +400,13 @@ function Header({ onOpenMenu, menuOpen }) {
 
         <div className="topbar-actions">
           <SearchBox />
-          <Link to="/library" aria-label="Your library">
-            <HeartIcon />
-          </Link>
+          {/* The library (wishlist) is a signed-in feature, so only show its
+              icon when there's a user. */}
+          {user && (
+            <Link to="/library" aria-label="Your library">
+              <HeartIcon />
+            </Link>
+          )}
           {/* Embedded in the plugin: hide the account menu (the sign-in link
               and the signed-in sign-out control). The plugin's Account button
               owns sign-in/out. Sign-up stays reachable via /signin directly. */}
@@ -545,6 +582,7 @@ export default function Layout() {
     <BreadcrumbContext.Provider value={setCrumbs}>
       <div className="site">
         <ScrollToTop />
+        <PromoStrip />
         <Header menuOpen={menuOpen} onOpenMenu={() => setMenuOpen(true)} />
         <MobileNav open={menuOpen} onClose={() => setMenuOpen(false)} />
         <main>

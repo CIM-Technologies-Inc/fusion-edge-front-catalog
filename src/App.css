@@ -7,9 +7,13 @@
   --panel: #f2f1ef;
   --line: #e3e1de;
 
-  /* Fusion Edge brand */
-  --navy: #1b4a8f;
-  --green: #6cc24a;
+  /* Fusion Edge brand — values taken straight from the logo artwork
+     (fusion-edge-brand/logo/fusion-edge-logo.png): "FUSION" navy #0e4185,
+     "EDGE" green #74cc44. These were previously approximations (#1b4a8f /
+     #6cc24a); snapped to the logo so the whole storefront, not just the
+     product cards, uses the real brand colors. */
+  --navy: #0e4185;
+  --green: #74cc44;
   --accent: var(--green);
 
   /* Warm highlight for sale badges and the active nav underline. Kept
@@ -44,6 +48,28 @@
   box-sizing: border-box;
 }
 
+/* Scroll-reveal: hidden + nudged down until <Reveal> adds .is-in when the
+   element scrolls into view, then it eases up into place. */
+.reveal {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  will-change: opacity, transform;
+}
+
+.reveal.is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
 body {
   margin: 0;
   background: #fff;
@@ -74,6 +100,62 @@ a {
 
 main {
   flex: 1;
+}
+
+/* ---------- promo strip ---------- */
+
+/* Thin announcement bar above the header. Logo navy ground, EDGE-green tag, so
+   it reads as brand. Not sticky — it scrolls away and the header alone sticks. */
+.promo-strip {
+  position: relative;
+  background: var(--navy);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1.5rem;
+  font-size: 0.82rem;
+  line-height: 1.3;
+}
+
+.promo-strip-msg {
+  margin: 0;
+  text-align: center;
+}
+
+/* Green pill lead-in, drawn from the logo's EDGE green. */
+.promo-strip-tag {
+  display: inline-block;
+  margin-right: 0.55rem;
+  padding: 0.08rem 0.5rem;
+  border-radius: 999px;
+  background: var(--green);
+  color: #0a2a57;
+  font-weight: 700;
+  font-size: 0.68rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  vertical-align: 0.05em;
+}
+
+.promo-strip-cta {
+  color: #fff;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  white-space: nowrap;
+}
+
+.promo-strip-cta:hover {
+  color: var(--green);
+}
+
+@media (max-width: 640px) {
+  .promo-strip {
+    padding: 0.45rem 0.9rem;
+    font-size: 0.76rem;
+  }
 }
 
 /* ---------- header ---------- */
@@ -155,22 +237,64 @@ main {
   display: inline-flex;
 }
 
-/* The green "online" dot sits on the user icon so the header reads as
-   logged-in at a glance. */
+/* Signed-in avatar: the user's initials in a navy circle (logo navy), with a
+   green "online" dot so the header reads as logged-in and active at a glance. */
 .account-avatar {
   position: relative;
-  display: inline-flex;
+  display: inline-grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 50%;
+  background: var(--navy);
+  color: #fff;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  transition: box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+/* Active ring on hover / when the menu is open, so it feels interactive. */
+.account-btn:hover .account-avatar {
+  box-shadow: 0 0 0 3px var(--fe-brand-soft, #e6eef9);
+}
+
+.account-btn[aria-expanded='true'] .account-avatar {
+  box-shadow: 0 0 0 3px var(--green);
 }
 
 .account-dot {
   position: absolute;
-  right: -2px;
-  bottom: -2px;
-  width: 8px;
-  height: 8px;
+  right: -1px;
+  bottom: -1px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--green);
   box-shadow: 0 0 0 2px #fff;
+}
+
+/* Logged-out: a solid navy "Log in" button in place of the old user icon. */
+/* Scoped under .topbar-actions so it beats the `.topbar-actions a` reset
+   (which strips background/padding and would make this invisible). */
+.topbar-actions .login-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45rem 1.05rem;
+  border-radius: var(--fe-radius-md, 6px);
+  background: var(--navy);
+  color: #fff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1;
+  transition: background 0.15s ease;
+}
+
+.topbar-actions .login-btn:hover {
+  background: #0b3569;
 }
 
 .account-menu {
@@ -378,7 +502,9 @@ main {
 }
 
 .back-to-top:hover {
-  background: #163d75;
+  /* darkened logo navy (matches the button-hover shade used elsewhere);
+     was #163d75, derived from the old off-brand navy. */
+  background: #0b3569;
 }
 
 .back-to-top svg {
@@ -1105,20 +1231,6 @@ main {
   z-index: -2;
 }
 
-/* Scrim so the copy stays legible over any frame. */
-.video-band::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0.55) 0%,
-    rgba(0, 0, 0, 0.3) 45%,
-    rgba(0, 0, 0, 0.1) 100%
-  );
-}
-
 .video-band-inner {
   max-width: var(--max);
   width: 100%;
@@ -1158,7 +1270,7 @@ main {
   position: relative;
   z-index: 2;
   max-width: var(--max);
-  margin: -5.5rem auto 3rem;
+  margin: 2.5rem auto 2.5rem;
   padding: 0 1.5rem;
   list-style: none;
   display: grid;
@@ -1166,23 +1278,20 @@ main {
   gap: 1.25rem;
 }
 
-/* fusion-edge-brand card: surface-raised, 1px line border, precise 6px corner,
-   borders-over-shadows. Fades up on load, staggered per card. */
+/* Borderless feature row: no card box — just icon + text in open columns,
+   divided by thin vertical lines. Lighter now that the row sits on plain
+   white instead of floating over the hero. Fades up, staggered per item. */
 .hero-feature {
   display: flex;
   align-items: flex-start;
   gap: 1rem;
-  padding: 1.4rem 1.5rem;
-  background: var(--fe-surface-raised);
-  border: 1px solid var(--fe-line);
-  border-radius: var(--fe-radius-md);
-  box-shadow: 0 18px 40px rgba(14, 65, 133, 0.14);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+  padding: 0.5rem 1.75rem;
   animation: fade-up 0.5s ease both;
 }
 
-.hero-feature:hover {
-  border-color: var(--fe-navy);
+/* Divider between items (not before the first). */
+.hero-feature + .hero-feature {
+  border-left: 1px solid var(--fe-line);
 }
 
 /* Stagger the three cards so they rise in sequence. */
@@ -1190,14 +1299,14 @@ main {
 .hero-feature:nth-child(2) { animation-delay: 0.15s; }
 .hero-feature:nth-child(3) { animation-delay: 0.25s; }
 
-/* Green-tinted badge, navy glyph — the brand's edge-green spark on structure. */
+/* Green-tinted circular badge, navy glyph — the brand's edge-green spark. */
 .hero-feature-icon {
   flex: 0 0 auto;
   display: grid;
   place-items: center;
   width: 3rem;
   height: 3rem;
-  border-radius: var(--fe-radius-md);
+  border-radius: 50%;
   background: color-mix(in srgb, var(--fe-edge-green) 16%, transparent);
   color: var(--fe-navy);
 }
@@ -1227,8 +1336,14 @@ main {
 @media (max-width: 52rem) {
   .hero-features {
     grid-template-columns: 1fr;
-    margin-top: -3rem;
-    gap: 0.9rem;
+    margin-top: 2rem;
+    gap: 1.4rem;
+  }
+  /* Stacked on mobile: swap the vertical divider for a top rule. */
+  .hero-feature + .hero-feature {
+    border-left: 0;
+    border-top: 1px solid var(--fe-line);
+    padding-top: 1.4rem;
   }
 }
 
@@ -1266,6 +1381,380 @@ main {
   padding: 0.85rem 2.1rem;
   font-size: 0.82rem;
   font-weight: 600;
+}
+
+/* Brand-navy variant of the solid button (logo navy). */
+.btn-solid-navy {
+  background: var(--navy);
+  border-radius: var(--fe-radius-md, 6px);
+}
+
+.btn-solid-navy:hover {
+  background: #0b3569;
+}
+
+/* ---------- Revit showcase band ---------- */
+
+.revit-showcase {
+  background: var(--fe-brand-soft, #e6eef9);
+}
+
+.revit-showcase-inner {
+  max-width: var(--max);
+  margin: 0 auto;
+  padding: 3.5rem 1.5rem;
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 3rem;
+  align-items: center;
+}
+
+.revit-showcase-copy h2 {
+  font-size: 2rem;
+  line-height: 1.15;
+  margin: 0 0 1rem;
+  color: var(--fe-ink, #0b1b33);
+}
+
+.revit-showcase-text {
+  color: var(--fe-ink-muted, #5a6b82);
+  font-size: 0.95rem;
+  line-height: 1.7;
+  margin: 0 0 1.6rem;
+  max-width: 34rem;
+}
+
+.revit-steps {
+  list-style: none;
+  margin: 0 0 2rem;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.revit-steps li {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--fe-ink, #0b1b33);
+}
+
+.revit-step-n {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 50%;
+  background: var(--green);
+  color: #0a2a57;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.revit-showcase-actions {
+  display: flex;
+  align-items: center;
+  gap: 1.4rem;
+  flex-wrap: wrap;
+}
+
+.revit-showcase-link {
+  color: var(--navy);
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.revit-showcase-link:hover {
+  text-decoration: underline;
+}
+
+/* Illustration: a product chip above a Revit drop zone, linked by a dashed
+   path. Pure CSS — no image asset required. */
+.revit-showcase-art {
+  position: relative;
+  min-height: 16rem;
+  display: grid;
+  place-items: center;
+}
+
+.revit-chip {
+  position: absolute;
+  top: 1rem;
+  left: 50%;
+  transform: translateX(-120%) rotate(-6deg);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 11rem;
+  padding: 0.7rem;
+  background: #fff;
+  border: 1px solid var(--fe-line, #dce3ed);
+  border-radius: 10px;
+  box-shadow: 0 12px 28px rgba(14, 65, 133, 0.22);
+}
+
+.revit-chip-swatch {
+  flex: none;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 6px;
+  background: linear-gradient(135deg, var(--navy), var(--green));
+}
+
+.revit-chip-lines {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+}
+
+.revit-chip-lines b,
+.revit-chip-lines i {
+  display: block;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--fe-line, #dce3ed);
+}
+
+.revit-chip-lines b {
+  width: 80%;
+}
+
+.revit-chip-lines i {
+  width: 55%;
+}
+
+.revit-drop {
+  display: grid;
+  place-items: center;
+  gap: 0.5rem;
+  width: 13rem;
+  height: 9.5rem;
+  margin-top: 3rem;
+  border: 2px dashed var(--navy);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--navy);
+}
+
+.revit-drop svg {
+  width: 2.6rem;
+  height: 2.6rem;
+}
+
+.revit-drop span {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 52rem) {
+  .revit-showcase-inner {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    padding: 2.5rem 1.5rem;
+  }
+  .revit-showcase-art {
+    min-height: 14rem;
+  }
+}
+
+/* ---------- plans preview ---------- */
+
+.plans-preview {
+  max-width: var(--max);
+  margin: 4rem auto 0;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.plans-preview h2 {
+  font-size: 1.7rem;
+  margin: 0 0 0.5rem;
+  color: var(--fe-ink, #0b1b33);
+}
+
+.plans-preview .sub {
+  color: var(--fe-ink-muted, #5a6b82);
+  font-size: 0.9rem;
+  max-width: 34rem;
+  margin: 0 auto 2rem;
+}
+
+.plan-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.2rem;
+  text-align: left;
+}
+
+.plan-preview-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 1.6rem 1.4rem;
+  background: #fff;
+  border: 1px solid var(--fe-line, #dce3ed);
+  border-radius: 12px;
+  box-shadow: var(--fe-shadow-card, 0 1px 2px rgba(11, 27, 51, 0.06));
+}
+
+/* The recommended plan: navy border + lift, so the eye lands on it. */
+.plan-preview-card.is-featured {
+  border-color: var(--navy);
+  box-shadow: 0 12px 28px rgba(14, 65, 133, 0.18);
+}
+
+.plan-preview-flag {
+  position: absolute;
+  top: -0.7rem;
+  left: 1.4rem;
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  background: var(--green);
+  color: #0a2a57;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.plan-preview-card h3 {
+  margin: 0 0 0.5rem;
+  font-size: 1.1rem;
+  color: var(--fe-ink, #0b1b33);
+}
+
+.plan-preview-access {
+  margin: 0 0 1.4rem;
+  font-size: 0.86rem;
+  line-height: 1.6;
+  color: var(--fe-ink-muted, #5a6b82);
+  flex: 1;
+}
+
+.plan-preview-cta {
+  align-self: flex-start;
+  color: var(--navy);
+  font-size: 0.88rem;
+  font-weight: 600;
+}
+
+.plan-preview-cta:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 52rem) {
+  .plan-cards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ---------- FAQ ---------- */
+
+.faq {
+  max-width: 48rem;
+  margin: 4rem auto 5rem;
+  padding: 0 1.5rem;
+  text-align: center;
+}
+
+.faq h2 {
+  font-size: 1.7rem;
+  margin: 0 0 0.5rem;
+  color: var(--fe-ink, #0b1b33);
+}
+
+.faq .sub {
+  color: var(--fe-ink-muted, #5a6b82);
+  font-size: 0.9rem;
+  margin: 0 auto 2rem;
+}
+
+.faq-list {
+  text-align: left;
+  border-top: 1px solid var(--fe-line, #dce3ed);
+}
+
+.faq-item {
+  border-bottom: 1px solid var(--fe-line, #dce3ed);
+}
+
+.faq-item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 0.25rem;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--fe-ink, #0b1b33);
+}
+
+/* Hide the default disclosure triangle (incl. Safari/WebKit). */
+.faq-item summary::-webkit-details-marker {
+  display: none;
+}
+
+.faq-item summary:hover {
+  color: var(--navy);
+}
+
+/* Custom +/− toggle, drawn with two bars; the vertical bar collapses when
+   the item is open to read as a minus. */
+.faq-mark {
+  position: relative;
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+}
+
+.faq-mark::before,
+.faq-mark::after {
+  content: '';
+  position: absolute;
+  background: var(--navy);
+  border-radius: 1px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.faq-mark::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%);
+}
+
+.faq-mark::after {
+  left: 50%;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  transform: translateX(-50%);
+}
+
+.faq-item[open] .faq-mark::after {
+  opacity: 0;
+  transform: translateX(-50%) scaleY(0);
+}
+
+.faq-item p {
+  margin: 0;
+  padding: 0 0.25rem 1.2rem;
+  font-size: 0.92rem;
+  line-height: 1.65;
+  color: var(--fe-ink-muted, #5a6b82);
+  max-width: 44rem;
 }
 
 .feature-art {
@@ -2438,6 +2927,30 @@ main {
   background: var(--fe-navy);
   border-color: var(--fe-navy);
   color: #fff;
+}
+
+/* Locked notice (e.g. download not included in the user's plan): a muted,
+   non-interactive pill with a readable inline link — not a solid CTA. */
+.btn-save.is-locked {
+  background: var(--fe-brand-soft, #e6eef9);
+  border-color: var(--fe-line, var(--line));
+  color: var(--fe-ink-muted, var(--muted, #5a6b82));
+  cursor: default;
+  font-size: 0.85rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-save.is-locked:hover {
+  background: var(--fe-brand-soft, #e6eef9);
+  border-color: var(--fe-line, var(--line));
+  color: var(--fe-ink-muted, var(--muted, #5a6b82));
+}
+
+.btn-save.is-locked a {
+  color: var(--fe-navy, inherit);
+  font-weight: 600;
+  text-decoration: underline;
 }
 
 .btn-save-signin:hover {
